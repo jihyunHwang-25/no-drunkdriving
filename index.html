@@ -3,442 +3,446 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>경기도교육청 교직원 음주운전 예방교육 - 방탈출 미션</title>
+    <title>🚨 [방탈출] 경기도교육청 교직원 음주운전 예방교육</title>
     <style>
         :root {
-            --primary-color: #003366;
-            --secondary-color: #0066cc;
-            --accent-color: #d9534f;
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-color: #333333;
+            --bg-dark: #121212;
+            --panel-bg: #1e1e1e;
+            --neon-green: #00ff66;
+            --neon-red: #ff3333;
+            --neon-yellow: #ffcc00;
+            --text-light: #e0e0e0;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
+            font-family: 'Courier New', Pretendard, sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--bg-dark);
+            color: var(--text-light);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
         }
 
-        .container {
+        .game-container {
             width: 100%;
-            max-width: 600px;
-            background: var(--card-bg);
+            max-width: 650px;
+            background: var(--panel-bg);
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.2);
             border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
             overflow: hidden;
+            position: relative;
         }
 
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 24px 20px;
+        .header {
+            background-color: #000;
+            padding: 20px;
             text-align: center;
+            border-bottom: 2px solid var(--neon-green);
         }
 
-        header h1 {
-            font-size: 1.3rem;
-            margin-bottom: 8px;
+        .header h1 {
+            color: var(--neon-green);
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
         }
 
-        header p {
-            font-size: 0.9rem;
-            opacity: 0.9;
+        .header p {
+            color: #aaa;
+            font-size: 0.85rem;
+            margin-top: 5px;
         }
 
-        .progress-bar {
-            height: 8px;
-            background-color: #e0e0e0;
-            width: 100%;
+        .door-status-bar {
+            display: flex;
+            justify-content: space-around;
+            background: #2a2a2a;
+            padding: 10px;
+            border-bottom: 1px solid #444;
         }
 
-        .progress-fill {
-            height: 100%;
-            background-color: var(--secondary-color);
-            width: 20%;
-            transition: width 0.4s ease;
+        .door-icon {
+            font-size: 0.8rem;
+            color: #666;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: #111;
         }
 
-        .content-body {
-            padding: 24px 20px;
+        .door-icon.cleared {
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+            box-shadow: 0 0 5px var(--neon-green);
         }
 
-        .step-card {
+        .door-icon.current {
+            color: var(--neon-yellow);
+            border: 1px solid var(--neon-yellow);
+        }
+
+        .content {
+            padding: 25px 20px;
+        }
+
+        .stage {
             display: none;
         }
 
-        .step-card.active {
+        .stage.active {
             display: block;
         }
 
-        .mission-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .info-box {
-            background-color: #eef5fc;
-            border-left: 4px solid var(--secondary-color);
-            padding: 12px 16px;
+        .mission-box {
+            background: #111;
+            border: 1px dashed var(--neon-green);
+            padding: 15px;
+            border-radius: 8px;
             margin-bottom: 20px;
-            font-size: 0.92rem;
             line-height: 1.6;
+            font-size: 0.95rem;
         }
 
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 15px;
         }
 
         label {
             display: block;
+            margin-bottom: 5px;
+            color: var(--neon-yellow);
             font-size: 0.9rem;
-            font-weight: bold;
-            margin-bottom: 8px;
         }
 
-        input[type="text"], select {
+        input[type="text"] {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+            background: #000;
+            border: 1px solid var(--neon-green);
+            color: #fff;
+            border-radius: 4px;
             font-size: 1rem;
         }
 
-        .options-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .option-btn {
-            padding: 12px 16px;
-            border: 1px solid #ddd;
-            background-color: #fff;
-            border-radius: 6px;
-            text-align: left;
-            cursor: pointer;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-        }
-
-        .option-btn:hover {
-            background-color: #f0f4f8;
-            border-color: var(--secondary-color);
-        }
-
-        .option-btn.selected {
-            background-color: #e3f2fd;
-            border-color: var(--secondary-color);
-            font-weight: bold;
-        }
-
-        .action-btn {
+        .choice-btn {
             width: 100%;
             padding: 14px;
-            background-color: var(--primary-color);
-            color: white;
+            margin-bottom: 10px;
+            background: #252525;
+            border: 1px solid #444;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.92rem;
+        }
+
+        .choice-btn:hover {
+            border-color: var(--neon-yellow);
+            background: #333;
+        }
+
+        .choice-btn.selected {
+            border-color: var(--neon-green);
+            background: #003311;
+            color: var(--neon-green);
+            font-weight: bold;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 15px;
+            background: var(--neon-green);
+            color: #000;
+            font-weight: bold;
+            font-size: 1.05rem;
             border: none;
             border-radius: 6px;
-            font-size: 1rem;
-            font-weight: bold;
             cursor: pointer;
-            transition: background 0.2s;
+            margin-top: 10px;
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
         }
 
-        .action-btn:hover {
-            background-color: #002244;
+        .btn-action:hover {
+            background: #00cc52;
         }
 
-        .action-btn:disabled {
-            background-color: #ccc;
+        .btn-action:disabled {
+            background: #555;
+            color: #888;
+            box-shadow: none;
             cursor: not-allowed;
         }
 
-        .error-msg {
-            color: var(--accent-color);
+        .msg-error {
+            color: var(--neon-red);
             font-size: 0.85rem;
-            margin-top: 8px;
+            margin-top: 10px;
             display: none;
-        }
-
-        /* 이수증 스타일 */
-        .cert-card {
-            border: 8px double var(--primary-color);
-            padding: 24px;
             text-align: center;
-            background-color: #fffdf9;
+        }
+
+        /* Certificate / Final Area */
+        .certificate {
+            background: #fff;
+            color: #000;
+            padding: 25px;
+            border-radius: 8px;
+            border: 5px double #003366;
             margin-bottom: 20px;
+            text-align: center;
         }
 
-        .cert-card h2 {
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            margin-bottom: 16px;
-            letter-spacing: 2px;
+        .certificate h2 {
+            color: #003366;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
         }
 
-        .cert-info {
+        .cert-details {
+            text-align: left;
+            margin: 20px 0;
             font-size: 0.95rem;
             line-height: 1.8;
-            margin: 20px 0;
-            text-align: left;
         }
 
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            .cert-card, .cert-card * {
-                visibility: visible;
-            }
-            .cert-card {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
+            body * { visibility: hidden; }
+            .certificate, .certificate * { visibility: visible; }
+            .certificate { position: absolute; left: 0; top: 0; width: 100%; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>🚪 음주운전 예방교육 방탈출 미션</h1>
+<div class="game-container">
+    <div class="header">
+        <h1>🔓 음주운전 예방 교육 : 방탈출 (GOE)</h1>
         <p>경기도교육청 교직원 음주운전 근절 미션</p>
-    </header>
-    <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
     </div>
 
-    <div class="content-body">
-        <!-- Step 0: 사용자 정보 입력 -->
-        <div class="step-card active" id="step0">
-            <div class="mission-title">📋 사용자 확인</div>
-            <div class="info-box">
-                방탈출 미션을 시작하기 전, 이수증 발급을 위한 교직원 정보를 입력해 주세요.
+    <div class="door-status-bar">
+        <div class="door-icon current" id="d0">입장</div>
+        <div class="door-icon" id="d1">문 1</div>
+        <div class="door-icon" id="d2">문 2</div>
+        <div class="door-icon" id="d3">문 3</div>
+        <div class="door-icon" id="d4">문 4</div>
+        <div class="door-icon" id="d5">탈출</div>
+    </div>
+
+    <div class="content">
+        <!-- Stage 0 -->
+        <div class="stage active" id="st0">
+            <div class="mission-box">
+                ⚠️ [경고] 당신은 음주운전 위험 구역에 갇혔습니다.<br>
+                이곳을 탈출하려면 경기도교육청 음주운전 예방지침 퀴즈 4개를 해결해야 합니다.
             </div>
             <div class="form-group">
-                <label for="userName">성명</label>
-                <input type="text" id="userName" placeholder="성함을 입력하세요">
+                <label for="pName">교직원 성명</label>
+                <input type="text" id="pName" placeholder="성명을 입력하세요">
             </div>
             <div class="form-group">
-                <label for="userSchool">소속 학교명</label>
-                <input type="text" id="userSchool" placeholder="예: OO초등학교">
+                <label for="pSchool">소속 학교명</label>
+                <input type="text" id="pSchool" placeholder="예: OO초등학교">
             </div>
-            <button class="action-btn" onclick="startMission()">미션 시작하기</button>
-            <div class="error-msg" id="error0">성명과 소속 학교명을 모두 입력해 주세요.</div>
+            <button class="btn-action" onclick="initGame()">게임 시작 (문 열기)</button>
+            <div class="msg-error" id="err0">성명과 소속 학교를 정확히 입력해 주세요!</div>
         </div>
 
-        <!-- Step 1: 징계 기준 암호 풀기 -->
-        <div class="step-card" id="step1">
-            <div class="mission-title">🔑 미션 1: 징계 기준 암호 해독</div>
-            <div class="info-box">
-                <b>[경기도교육청 지침]</b><br>
-                혈중알코올농도 <b>0.2% 이상</b>의 최악의 만취 운전으로 최초 적발될 경우 받게 되는 신분상 징계 수위는 무엇일까요?
+        <!-- Stage 1 -->
+        <div class="stage" id="st1">
+            <div class="mission-box">
+                🔑 <b>[Door 1] 징계 기준 해독</b><br>
+                혈중알코올농도 <b>0.2% 이상</b>의 만취 상태로 최초 적발된 경우, 경기도교육청 공무원 징계 양정 기준에 따른 신분상 처분은?
             </div>
-            <div class="options-group">
-                <button class="option-btn" onclick="selectOption(1, '견책~감봉')">1. 견책 ~ 감봉</button>
-                <button class="option-btn" onclick="selectOption(1, '정직 1개월~3개월')">2. 정직 1개월 ~ 3개월</button>
-                <button class="option-btn" onclick="selectOption(1, '해임~파면')">3. 해임 ~ 파면</button>
-                <button class="option-btn" onclick="selectOption(1, '강등~해임')">4. 강등 ~ 해임</button>
-            </div>
-            <button class="action-btn" onclick="checkStep1()">잠금 해제</button>
-            <div class="error-msg" id="error1">정답이 아닙니다. 음주운전 신분상 불이익은 매우 엄중합니다!</div>
+            <button class="choice-btn" onclick="pick(1, 'A')">1. 견책 ~ 감봉</button>
+            <button class="choice-btn" onclick="pick(1, 'B')">2. 정직 1개월 ~ 3개월</button>
+            <button class="choice-btn" onclick="pick(1, 'C')">3. 해임 ~ 파면</button>
+            <button class="choice-btn" onclick="pick(1, 'D')">4. 강등 ~ 해임</button>
+            <button class="btn-action" onclick="solve1()">자물쇠 해제</button>
+            <div class="msg-error" id="err1">❌ 잘못된 암호입니다. 만취 음주운전은 중징계(강등~해임) 대상입니다!</div>
         </div>
 
-        <!-- Step 2: 숙취운전 위험 계산 -->
-        <div class="step-card" id="step2">
-            <div class="mission-title">🍷 미션 2: 숙취운전 계산기</div>
-            <div class="info-box">
-                전날 밤 늦게까지 술을 마시고 다음 날 아침 출근길에 운전대를 잡았습니다. 숙취운전에 대한 설명 중 <b>옳지 않은 것</b>은?
+        <!-- Stage 2 -->
+        <div class="stage" id="st2">
+            <div class="mission-box">
+                🍷 <b>[Door 2] 숙취운전 트랩</b><br>
+                전날 마신 술이 깨지 않은 상태에서 출근하다 단속에 적발되었습니다. 다음 중 <b>틀린 설명</b>은?
             </div>
-            <div class="options-group">
-                <button class="option-btn" onclick="selectOption(2, '1')">1. 자고 일어났어도 체내 알코올 분회가 완료되지 않았다면 음주운전에 해당한다.</button>
-                <button class="option-btn" onclick="selectOption(2, '2')">2. 숙취운전으로 적발되어도 출근길이었으므로 징계 감경 사유가 된다.</button>
-                <button class="option-btn" onclick="selectOption(2, '3')">3. 음주 단속 기준 수치(0.03%) 이상이면 예외 없이 처벌받는다.</button>
-            </div>
-            <button class="action-btn" onclick="checkStep2()">미션 완료</button>
-            <div class="error-msg" id="error2">정답이 아닙니다. 음주운전은 출근길이나 숙취 여부와 상관없이 감경 대상이 아닙니다.</div>
+            <button class="choice-btn" onclick="pick(2, 'A')">1. 체내 알코올이 남아있다면 숙취 상태라도 음주운전 처벌을 받는다.</button>
+            <button class="choice-btn" onclick="pick(2, 'B')">2. 출근길 숙취운전은 정상 참작되어 징계가 감경된다.</button>
+            <button class="choice-btn" onclick="pick(2, 'C')">3. 음주 단속 기준인 0.03% 이상이면 예외 없이 처벌 대상이다.</button>
+            <button class="btn-action" onclick="solve2()">자물쇠 해제</button>
+            <div class="msg-error" id="err2">❌ 잘못된 답입니다! 음주운전은 출근길/숙취 사유로 징계 감경이 절대 불가합니다.</div>
         </div>
 
-        <!-- Step 3: 연쇄 불이익 퀴즈 -->
-        <div class="step-card" id="step3">
-            <div class="mission-title">📉 미션 3: 경제적·재정적 불이익</div>
-            <div class="info-box">
-                음주운전으로 적발될 경우 신분상 징계 외에 따라오는 불이익이 <b>아닌 것</b>은?
+        <!-- Stage 3 -->
+        <div class="stage" id="st3">
+            <div class="mission-box">
+                📉 <b>[Door 3] 연쇄 재정 불이익</b><br>
+                음주운전 적발 시 신분상 징계 외에 뒤따르는 경제적·재정적 불이익이 <b>아닌 것</b>은?
             </div>
-            <div class="options-group">
-                <button class="option-btn" onclick="selectOption(3, '1')">1. 맞춤형 복지점수 차등/제한</button>
-                <button class="option-btn" onclick="selectOption(3, '2')">2. 성과상여금 지급 제외 및 포상 추천 제한</button>
-                <button class="option-btn" onclick="selectOption(3, '3')">3. 교직원 대출 금리 우대 혜택 제공</button>
-                <button class="option-btn" onclick="selectOption(3, '4')">4. 국외연수 및 해외파견 대상 제외</button>
-            </div>
-            <button class="action-btn" onclick="checkStep3()">다음 문 열기</button>
-            <div class="error-msg" id="error3">정답이 아닙니다! 올바른 답을 선택해 주세요.</div>
+            <button class="choice-btn" onclick="pick(3, 'A')">1. 맞춤형 복지점수 지급 제한</button>
+            <button class="choice-btn" onclick="pick(3, 'B')">2. 성과상여금 지급 제외 및 포상 추천 제한</button>
+            <button class="choice-btn" onclick="pick(3, 'C')">3. 교직원 대출 금리 우대 혜택 적용</button>
+            <button class="choice-btn" onclick="pick(3, 'D')">4. 국외연수 및 해외파견 대상자 제외</button>
+            <button class="btn-action" onclick="solve3()">자물쇠 해제</button>
+            <div class="msg-error" id="err3">❌ 오답입니다! 대출 우대 등 혜택은 없으며 12가지 행정적 불이익이 뒤따릅니다.</div>
         </div>
 
-        <!-- Step 4: 방조죄 책임 퀴즈 -->
-        <div class="step-card" id="step4">
-            <div class="mission-title">🛡️ 미션 4: 동승 및 방조 책임</div>
-            <div class="info-box">
-                동료 교직원이 술을 마신 후 운전하려는 것을 알고도 차에 함께 탑승했거나 열쇠를 건네준 경우 받는 처벌은?
+        <!-- Stage 4 -->
+        <div class="stage" id="st4">
+            <div class="mission-box">
+                🛡️ <b>[Door 4] 방조 및 동승 책임</b><br>
+                동료 교직원의 음주운전을 알고도 차에 같이 탔거나 자동차 열쇠를 제공한 경우 받게 되는 처벌은?
             </div>
-            <div class="options-group">
-                <button class="option-btn" onclick="selectOption(4, '1')">1. 단순 동승이므로 아무런 처벌이나 징계를 받지 않는다.</button>
-                <button class="option-btn" onclick="selectOption(4, '2')">2. 음주운전 방조죄로 형사처벌 및 교직원 징계 대상이 된다.</button>
-                <button class="option-btn" onclick="selectOption(4, '3')">3. 운전자만 처벌받고 동승자는 주의 조치만 받는다.</button>
-            </div>
-            <button class="action-btn" onclick="checkStep4()">최종 탈출문 열기</button>
-            <div class="error-msg" id="error4">정답이 아닙니다. 음주운전 방조 역시 중대한 범죄입니다.</div>
+            <button class="choice-btn" onclick="pick(4, 'A')">1. 단순 동승자이므로 징계를 받지 않는다.</button>
+            <button class="choice-btn" onclick="pick(4, 'B')">2. 음주운전 방조죄로 형사처벌 및 교직원 징계 대상이 된다.</button>
+            <button class="choice-btn" onclick="pick(4, 'C')">3. 운전자만 처벌받고 동승자는 서면 경고에 그친다.</button>
+            <button class="btn-action" onclick="solve4()">최종 탈출문 열기</button>
+            <div class="msg-error" id="err4">❌ 오답입니다! 음주운전 방조는 공직사회 엄중 처벌 대상입니다.</div>
         </div>
 
-        <!-- Step 5: 음주운전 근절 서약 및 이수증 -->
-        <div class="step-card" id="step5">
-            <div class="mission-title">🎉 최종 단계: 음주운전 근절 서약서</div>
-            
-            <div class="cert-card" id="certArea">
-                <h2>음 주 운 전 예 방 교 육 이 수 증</h2>
-                <div class="cert-info">
-                    <p><b>성 명:</b> <span id="certName"></span></p>
-                    <p><b>소 속:</b> <span id="certSchool"></span></p>
-                    <p><b>이수일시:</b> <span id="certDate"></span></p>
-                    <p><b>발급번호:</b> <span id="certCode"></span></p>
-                    <br>
-                    <p style="text-align: center; font-weight: bold; font-size: 0.9rem;">
-                        위 사람은 경기도교육청 지침에 따른 교직원 음주운전 예방교육 방탈출 미션을 완료하고, 음주운전 근절을 다짐하였음을 증명합니다.
+        <!-- Stage 5: 탈출 성공 및 이수증 제출 -->
+        <div class="stage" id="st5">
+            <div class="certificate">
+                <h2>🎉 탈 출 성 공 (이 수 증)</h2>
+                <div class="cert-details">
+                    <p><b>성 명:</b> <span id="cName"></span></p>
+                    <p><b>소 속:</b> <span id="cSchool"></span></p>
+                    <p><b>이수일시:</b> <span id="cDate"></span></p>
+                    <p><b>발급코드:</b> <span id="cCode"></span></p>
+                    <hr style="margin: 15px 0;">
+                    <p style="text-align: center; font-size: 0.88rem; font-weight: bold;">
+                        위 사람은 경기도교육청 음주운전 예방교육 방탈출 미션을 완료하고, 음주운전 근절 서약을 이수하였음을 확인합니다.
                     </p>
                 </div>
             </div>
 
-            <button class="action-btn" id="submitBtn" onclick="finishAndSave()" style="margin-bottom: 10px;">서약 완료 및 구글 시트 이수 기록 저장</button>
-            <button class="action-btn" onclick="window.print()" style="background-color: #555;">이수증 인쇄 / PDF 저장</button>
-            <div class="error-msg" id="saveStatus" style="color: green; text-align: center; font-weight: bold; display:none;"></div>
+            <button class="btn-action" id="subBtn" onclick="submitToSheet()" style="margin-bottom: 10px;">서약 완료 및 구글 시트에 이수 기록 저장</button>
+            <button class="btn-action" onclick="window.print()" style="background: #444; color: #fff;">이수증 인쇄 / PDF 저장</button>
+            <div class="msg-error" id="saveMsg" style="margin-top:12px; font-weight:bold;"></div>
         </div>
     </div>
 </div>
 
 <script>
     // ================================================================
-    // [중요] 교감선생님의 구글 앱스 스크립트 웹 앱 URL을 아래에 넣어주세요!
+    // [구글 앱스 스크립트 배포 URL을 아래 주소 자리에 넣어주세요]
     // ================================================================
-    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxBYrRJK_wEgewlofj9Q_izhgLUKNefnYLDLmZ_iMmXVW_Gidfl8Rhy2T-cxJCBOvAh/exec"; 
+    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxBYrRJK_wEgewlofj9Q_izhgLUKNefnYLDLmZ_iMmXVW_Gidfl8Rhy2T-cxJCBOvAh/exec";
 
-    let userData = {
+    let playData = {
         name: '',
         school: '',
         answers: {}
     };
 
-    function startMission() {
-        const name = document.getElementById('userName').value.trim();
-        const school = document.getElementById('userSchool').value.trim();
+    function initGame() {
+        const name = document.getElementById('pName').value.trim();
+        const school = document.getElementById('pSchool').value.trim();
 
-        if(!name || !school) {
-            document.getElementById('error0').style.display = 'block';
+        if (!name || !school) {
+            document.getElementById('err0').style.display = 'block';
             return;
         }
 
-        userData.name = name;
-        userData.school = school;
-        document.getElementById('error0').style.display = 'none';
+        playData.name = name;
+        playData.school = school;
+        document.getElementById('err0').style.display = 'none';
 
-        goToStep(1);
+        moveStage(1);
     }
 
-    function selectOption(step, val) {
-        userData.answers[step] = val;
-        const btns = document.querySelectorAll(`#step${step} .option-btn`);
-        btns.forEach(btn => btn.classList.remove('selected'));
+    function pick(stageNum, choice) {
+        playData.answers[stageNum] = choice;
+        const btns = document.querySelectorAll(`#st${stageNum} .choice-btn`);
+        btns.forEach(b => b.classList.remove('selected'));
         event.target.classList.add('selected');
     }
 
-    function goToStep(stepNum) {
-        document.querySelectorAll('.step-card').forEach(card => card.classList.remove('active'));
-        document.getElementById(`step${stepNum}`).classList.add('active');
-        document.getElementById('progressFill').style.width = `${(stepNum / 5) * 100}%`;
+    function moveStage(st) {
+        document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+        document.getElementById(`st${st}`).classList.add('active');
+
+        document.querySelectorAll('.door-icon').forEach((d, idx) => {
+            d.classList.remove('current');
+            if (idx < st) d.classList.add('cleared');
+            if (idx === st) d.classList.add('current');
+        });
     }
 
-    function checkStep1() {
-        if (userData.answers[1] === '강등~해임') {
-            document.getElementById('error1').style.display = 'none';
-            goToStep(2);
+    function solve1() {
+        if (playData.answers[1] === 'D') {
+            document.getElementById('err1').style.display = 'none';
+            moveStage(2);
         } else {
-            document.getElementById('error1').style.display = 'block';
+            document.getElementById('err1').style.display = 'block';
         }
     }
 
-    function checkStep2() {
-        if (userData.answers[2] === '2') {
-            document.getElementById('error2').style.display = 'none';
-            goToStep(3);
+    function solve2() {
+        if (playData.answers[2] === 'B') {
+            document.getElementById('err2').style.display = 'none';
+            moveStage(3);
         } else {
-            document.getElementById('error2').style.display = 'block';
+            document.getElementById('err2').style.display = 'block';
         }
     }
 
-    function checkStep3() {
-        if (userData.answers[3] === '3') {
-            document.getElementById('error3').style.display = 'none';
-            goToStep(4);
+    function solve3() {
+        if (playData.answers[3] === 'C') {
+            document.getElementById('err3').style.display = 'none';
+            moveStage(4);
         } else {
-            document.getElementById('error3').style.display = 'block';
+            document.getElementById('err3').style.display = 'block';
         }
     }
 
-    function checkStep4() {
-        if (userData.answers[4] === '2') {
-            document.getElementById('error4').style.display = 'none';
-            
-            // 이수증 데이터 채우기
+    function solve4() {
+        if (playData.answers[4] === 'B') {
+            document.getElementById('err4').style.display = 'none';
+
             const now = new Date();
             const dateStr = now.getFullYear() + '년 ' + (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
             const codeStr = 'GOE-' + Math.floor(100000 + Math.random() * 900000);
 
-            document.getElementById('certName').innerText = userData.name;
-            document.getElementById('certSchool').innerText = userData.school;
-            document.getElementById('certDate').innerText = dateStr;
-            document.getElementById('certCode').innerText = codeStr;
+            document.getElementById('cName').innerText = playData.name;
+            document.getElementById('cSchool').innerText = playData.school;
+            document.getElementById('cDate').innerText = dateStr;
+            document.getElementById('cCode').innerText = codeStr;
 
-            userData.timestamp = dateStr;
-            userData.certCode = codeStr;
+            playData.timestamp = dateStr;
+            playData.certCode = codeStr;
 
-            goToStep(5);
+            moveStage(5);
         } else {
-            document.getElementById('error4').style.display = 'block';
+            document.getElementById('err4').style.display = 'block';
         }
     }
 
-    function finishAndSave() {
-        const statusDiv = document.getElementById('saveStatus');
-        const submitBtn = document.getElementById('submitBtn');
+    function submitToSheet() {
+        const msg = document.getElementById('saveMsg');
+        const btn = document.getElementById('subBtn');
 
-        statusDiv.style.display = 'block';
-        statusDiv.style.color = 'blue';
-        statusDiv.innerText = '구글 시트로 이수 내역을 전송 중입니다...';
-        submitBtn.disabled = true;
+        msg.style.display = 'block';
+        msg.style.color = '#ffcc00';
+        msg.innerText = '⏳ 구글 시트로 이수 기록 전송 중...';
+        btn.disabled = true;
 
         if (!GOOGLE_SHEET_URL || GOOGLE_SHEET_URL.includes("YOUR_SCRIPT_ID_HERE")) {
-            statusDiv.style.color = 'red';
-            statusDiv.innerText = '⚠️ 구글 시트 URL 설정이 필요합니다. (html 파일 내 GOOGLE_SHEET_URL 수정)';
-            submitBtn.disabled = false;
+            msg.style.color = '#ff3333';
+            msg.innerText = '⚠️ 구글 시트 URL이 입력되지 않았습니다. (GOOGLE_SHEET_URL 변수 확인)';
+            btn.disabled = false;
             return;
         }
 
@@ -449,20 +453,20 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                timestamp: userData.timestamp,
-                school: userData.school,
-                name: userData.name,
-                certCode: userData.certCode
+                timestamp: playData.timestamp,
+                school: playData.school,
+                name: playData.name,
+                certCode: playData.certCode
             })
         })
         .then(() => {
-            statusDiv.style.color = 'green';
-            statusDiv.innerText = '✅ 구글 시트에 이수 기록이 정상적으로 저장되었습니다!';
+            msg.style.color = '#00ff66';
+            msg.innerText = '✅ 구글 시트에 이수 기록이 정상 기록되었습니다!';
         })
         .catch(err => {
-            statusDiv.style.color = 'red';
-            statusDiv.innerText = '❌ 저장 실패: 네트워크 연결을 확인해 주세요.';
-            submitBtn.disabled = false;
+            msg.style.color = '#ff3333';
+            msg.innerText = '❌ 전송 실패: 인터넷 연결을 확인해주세요.';
+            btn.disabled = false;
         });
     }
 </script>
