@@ -321,7 +321,8 @@
 <script>
     // ================================================================
     // 📌 [구글 앱스 스크립트 WEB APP URL]
-    // 개인 구글 계정으로 발급받은 Apps Script Web App URL을 여기에 붙여넣으세요.
+    // 교감선생님의 Apps Script Web App URL을 아래 큰따옴표 안의 YOUR_SCRIPT_ID_HERE 부분에만 바꿔 넣어주세요!
+    // 예시: const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycb.../exec";
     // ================================================================
     const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbz67QX0Quivd0nRG3wuxy6HJw4lcG4wy66PkEuGGxS_1mRzaxYhsnIhavzT0zhuOr8/exec"; 
 
@@ -405,7 +406,6 @@
             return;
         }
 
-        // 구글 서버에 안정적으로 전송하기 위한 URL-encoded FormData 방식
         const formData = new URLSearchParams();
         formData.append('timestamp', userData.timestamp);
         formData.append('school', userData.school);
