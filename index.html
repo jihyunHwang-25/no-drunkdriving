@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>비밀의 교무실 : 음주운전 ZERO 미션</title>
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,7 +19,6 @@
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Setup environment app ID & config
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'goe-drunk-driving-prevent';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyDummyKeyForFallbackOnly",
@@ -34,7 +33,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Expose globally for game script
         window.db = db;
         window.appId = appId;
         window.auth = auth;
@@ -42,7 +40,6 @@
         window.collection = collection;
         window.onSnapshot = onSnapshot;
 
-        // Auto authenticate
         async function initAuth() {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -67,17 +64,10 @@
         .glow-text {
             text-shadow: 0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
         }
-        .glow-red {
-            text-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
-        }
         .bg-glass {
             background: rgba(30, 41, 59, 0.75);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .bg-glass-card {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .keypad-btn {
             transition: all 0.15s ease;
@@ -85,7 +75,6 @@
         .keypad-btn:active {
             transform: scale(0.92);
         }
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -115,14 +104,14 @@
                 </div>
             </div>
             
-            <div class="flex items-center space-x-2 sm:space-x-4">
+            <div class="flex items-center space-x-2 sm:space-x-3">
                 <div class="text-right hidden sm:block">
                     <span class="text-xs text-slate-400">현재 미션</span>
                     <p id="stage-indicator" class="text-sm font-bold text-blue-400">STAGE 1 / 5</p>
                 </div>
-                <button onclick="openAdminModal()" class="px-2.5 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 text-xs font-semibold transition flex items-center gap-1.5" title="교감선생님 전용 이수자 명단">
-                    <i class="fa-solid fa-list-check"></i>
-                    <span class="hidden sm:inline">이수자 명단</span>
+                <button onclick="openAdminModal()" class="px-3 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 text-xs font-semibold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-file-excel text-green-400"></i>
+                    <span>구글 시트 / 이수 명단</span>
                 </button>
                 <button id="sound-toggle" onclick="toggleAudio()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="음향 효과">
                     <i id="sound-icon" class="fa-solid fa-volume-high"></i>
@@ -137,6 +126,7 @@
 
     <main class="flex-grow max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center my-2">
 
+        <!-- Intro Screen -->
         <div id="screen-intro" class="bg-glass rounded-2xl p-6 sm:p-8 text-center border border-slate-700 shadow-2xl relative overflow-hidden">
             <div class="absolute -top-12 -right-12 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -159,8 +149,8 @@
                     <span>방탈출 안내 및 유의사항</span>
                 </div>
                 <p>• 각 단계별 문제와 상황 시나리오를 읽고 퀴즈나 암호를 맞추세요.</p>
-                <p>• 막힐 때는 <span class="text-yellow-400 font-semibold">[힌트 보기]</span> 버튼을 적극 활용할 수 있습니다.</p>
-                <p>• 5단계를 모두 클리어하면 개인 명의의 <strong class="text-green-400">연수 이수 인증서</strong>가 발급됩니다.</p>
+                <p>• 막힐 때는 <span class="text-yellow-400 font-semibold">[힌트 보기]</span> 버튼을 활용할 수 있습니다.</p>
+                <p>• 5단계를 완수하면 입력한 성명과 학교명으로 <strong class="text-green-400">구글 시트에 이수자 기록</strong>이 전달됩니다.</p>
             </div>
 
             <button onclick="startGame()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-lg rounded-xl shadow-lg shadow-blue-500/25 transition transform active:scale-95 flex items-center justify-center mx-auto space-x-2">
@@ -181,7 +171,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Left: Story Context -->
                 <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-800 text-sm space-y-3">
                     <div class="p-3 bg-red-950/40 border border-red-500/30 rounded-lg text-red-200 text-xs flex gap-2 items-start">
                         <i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i>
@@ -190,7 +179,7 @@
                         </div>
                     </div>
                     <p class="text-slate-300 leading-relaxed">
-                        자고 일어났더라도 체내 알코올 분화 속도는 개인별로 다르며, 아침 숙취 상태 운전 역시 <strong class="text-amber-400">음주운전에 해당</strong>합니다!
+                        자고 일어났더라도 체내 알코올 분해 속도는 개인별로 다르며, 아침 숙취 상태 운전 역시 <strong class="text-amber-400">음주운전에 해당</strong>합니다!
                     </p>
                     <div class="bg-slate-800/80 p-3 rounded-lg border border-slate-700">
                         <h4 class="font-semibold text-xs text-blue-300 mb-1">🔍 음주운전 단속 기준 (도로교통법)</h4>
@@ -200,11 +189,10 @@
                         </ul>
                     </div>
                     <div class="text-xs text-slate-400 italic">
-                        [문제] 도로교통법상 음주운전 단속 대상인 <span class="text-slate-200 font-bold">"면허 정지 최소 혈중알코올농도 수치(소수점 아래 두 자리 숫자를 백분율 수치화한 두 자리)"</span>와 <span class="text-slate-200 font-bold">"면허 취소 최소 수치"</span>를 순서대로 조합하여 4자리 암호를 입력하세요.
+                        [문제] 도로교통법상 음주운전 단속 대상인 <span class="text-slate-200 font-bold">"면허 정지 최소 수치(소수점 아래 두 자리 2자리)"</span>와 <span class="text-slate-200 font-bold">"면허 취소 최소 수치(2자리)"</span>를 순서대로 조합하여 4자리 암호를 입력하세요.
                     </div>
                 </div>
 
-                <!-- Right: Interactive Keypad -->
                 <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800 flex flex-col justify-center items-center">
                     <p class="text-xs text-slate-400 mb-2">전자 도어락 암호 입력 (4자리)</p>
                     
@@ -242,8 +230,7 @@
                 경기도교육청 교직원 음주운전 징계양정 기준에 맞게 <strong class="text-blue-400">[음주운전 유형]</strong>과 <strong class="text-indigo-400">[최소 징계 수위]</strong>를 올바르게 연결하세요.
             </p>
 
-            <div class="space-y-3 mb-6" id="match-quiz-container">
-                <!-- Case 1 -->
+            <div class="space-y-3 mb-6">
                 <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div class="text-xs sm:text-sm text-slate-200 flex items-center gap-2">
                         <span class="w-6 h-6 rounded-full bg-blue-900/50 text-blue-400 border border-blue-700/50 flex items-center justify-center font-bold text-xs shrink-0">1</span>
@@ -257,7 +244,6 @@
                     </select>
                 </div>
 
-                <!-- Case 2 -->
                 <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div class="text-xs sm:text-sm text-slate-200 flex items-center gap-2">
                         <span class="w-6 h-6 rounded-full bg-blue-900/50 text-blue-400 border border-blue-700/50 flex items-center justify-center font-bold text-xs shrink-0">2</span>
@@ -271,11 +257,10 @@
                     </select>
                 </div>
 
-                <!-- Case 3 -->
                 <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div class="text-xs sm:text-sm text-slate-200 flex items-center gap-2">
                         <span class="w-6 h-6 rounded-full bg-blue-900/50 text-blue-400 border border-blue-700/50 flex items-center justify-center font-bold text-xs shrink-0">3</span>
-                        <span>2회 이상 음주운전 또는 음주운전 운전면허 정지·취소 상태에서 운전</span>
+                        <span>2회 이상 음주운전 또는 면허 정지·취소 상태에서 운전</span>
                     </div>
                     <select id="stage2-q3" class="bg-slate-800 text-xs sm:text-sm text-slate-200 rounded-lg border border-slate-700 p-2.5 w-full sm:w-48 focus:border-blue-500 outline-none">
                         <option value="">-- 징계 수위 선택 --</option>
@@ -305,17 +290,17 @@
             <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-800 mb-6 text-xs sm:text-sm leading-relaxed text-slate-300">
                 <p class="mb-2">
                     <i class="fa-solid fa-triangle-exclamation text-amber-400 mr-1"></i>
-                    음주운전 적발 시, 단순 징계 처분으로 끝나는 것이 아닙니다! 교직원 신분상·재정상 <strong class="text-red-400">엄중한 연쇄 불이익</strong>이 따라옵니다.
+                    음주운전 적발 시 단순 징계 처분 외에도 교직원 신분상·재정상 <strong class="text-red-400">엄중한 연쇄 불이익</strong>이 따라옵니다.
                 </p>
-                <p class="text-slate-400">다음 중 경기도교육청 교직원이 음주운전으로 적발되었을 때 받게 되는 불이익에 대한 설명으로 <span class="text-red-400 font-bold underline">올바르지 않은 것 하나</span>를 찾아 금고를 해제하세요.</p>
+                <p class="text-slate-400">다음 중 교직원이 음주운전 적발 시 받게 되는 불이익에 대한 설명으로 <span class="text-red-400 font-bold underline">올바르지 않은 것 하나</span>를 찾아 금고를 해제하세요.</p>
             </div>
 
-            <div class="space-y-3 mb-6" id="stage3-options">
+            <div class="space-y-3 mb-6">
                 <label class="block bg-slate-900/90 p-4 rounded-xl border border-slate-800 hover:border-slate-600 transition cursor-pointer">
                     <div class="flex items-start gap-3">
                         <input type="radio" name="stage3-choice" value="1" class="mt-1 accent-blue-500">
                         <div class="text-xs sm:text-sm text-slate-200">
-                            <strong>A.</strong> 맞춤형 복지비(복지포인트) 감축 및 성과상여금 지급 평가 시 감점/최하위 등급 지정 등 경제적 불이익이 발생한다.
+                            <strong>A.</strong> 맞춤형 복지비 감축 및 성과상여금 평가 감점/최하위 등급 지정 등 경제적 불이익이 발생한다.
                         </div>
                     </div>
                 </label>
@@ -333,7 +318,7 @@
                     <div class="flex items-start gap-3">
                         <input type="radio" name="stage3-choice" value="3" class="mt-1 accent-blue-500">
                         <div class="text-xs sm:text-sm text-slate-200">
-                            <strong>C.</strong> 최초 0.03% 이상 적발 시라도 단순 실수로 인정되어 교원 전보나 관내 만기 전보 시 아무런 감점 불이익이 없다.
+                            <strong>C.</strong> 최초 0.03% 이상 적발 시라도 단순 실수로 인정되어 전보 시 아무런 감점 불이익이 없다.
                         </div>
                     </div>
                 </label>
@@ -342,7 +327,7 @@
                     <div class="flex items-start gap-3">
                         <input type="radio" name="stage3-choice" value="4" class="mt-1 accent-blue-500">
                         <div class="text-xs sm:text-sm text-slate-200">
-                            <strong>D.</strong> 승진 가산점 제외 및 근무성적평정 시 신분상 불이익 반영으로 교감/교장 승진에 결정적 장애가 된다.
+                            <strong>D.</strong> 승진 가산점 제외 및 근무성적평정 불이익 반영으로 교감/교장 승진에 결정적 장애가 된다.
                         </div>
                     </div>
                 </label>
@@ -364,7 +349,6 @@
                 </button>
             </div>
 
-            <!-- Scenario Card -->
             <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800 mb-6 text-xs sm:text-sm">
                 <div class="flex items-center gap-2 text-amber-400 font-bold mb-2">
                     <i class="fa-solid fa-users text-base"></i>
@@ -374,14 +358,9 @@
                     교직원 회식 후, 동료 교사 A씨가 술을 마신 상태에서 "집이 가까우니 내 차로 데려다주겠다"며 차 열쇠를 집어 들었습니다.<br>
                     이 상황에서 함께 있던 동료들의 대처 중 <strong class="text-green-400">형사처벌(음주운전 방조죄) 및 징계 대상이 되지 않는 올바른 대처</strong>는 무엇일까요?
                 </p>
-
-                <div class="bg-amber-950/30 border border-amber-500/20 p-3 rounded-lg text-amber-200 text-xs">
-                    💡 <strong>참고:</strong> 음주운전임을 알면서도 차 열쇠를 제공하거나, 음주운전을 권유 및 방조하고, 차량에 동승한 경우 형법상 <strong>'음주운전 방조죄'</strong>로 처벌받을 수 있습니다.
-                </div>
             </div>
 
-            <!-- Quiz Choices -->
-            <div class="space-y-3 mb-6" id="stage4-options">
+            <div class="space-y-3 mb-6">
                 <label class="block bg-slate-900/80 p-4 rounded-xl border border-slate-800 hover:border-slate-600 transition cursor-pointer">
                     <div class="flex items-start gap-3">
                         <input type="radio" name="stage4-choice" value="1" class="mt-1 accent-blue-500">
@@ -395,7 +374,7 @@
                     <div class="flex items-start gap-3">
                         <input type="radio" name="stage4-choice" value="2" class="mt-1 accent-blue-500">
                         <div class="text-xs sm:text-sm text-slate-200">
-                            ② 적극적으로 A씨의 차량 열쇠를 빼앗아 안전하게 대리운전을 직접 호출해주거나 대중교통을 이용하도록 조치한다.
+                            ② 적극적으로 A씨의 차량 열쇠를 제지하고, 대리운전을 호출해주거나 대중교통을 이용하도록 돕는다.
                         </div>
                     </div>
                 </label>
@@ -404,7 +383,7 @@
                     <div class="flex items-start gap-3">
                         <input type="radio" name="stage4-choice" value="3" class="mt-1 accent-blue-500">
                         <div class="text-xs sm:text-sm text-slate-200">
-                            ③ A씨에게 차 키를 건네주며 "단속 안 하는 골목길로 조심히 가라"고 말해준다.
+                            ③ A씨에게 차 키를 건네주며 "단속 안 하는 골목길로 조심히 가라"고 건네준다.
                         </div>
                     </div>
                 </label>
@@ -425,7 +404,7 @@
 
             <p class="text-xs sm:text-sm text-slate-300 mb-6 leading-relaxed">
                 축하합니다! 4개 미션을 완수하여 교무실 마스터키의 80%를 확보했습니다.<br>
-                최종 탈출을 위해 <strong class="text-blue-400">경기도교육청 교직원 음주운전 예방 5대 약속</strong>을 확인하고 본인의 성명과 소속 학교명을 입력하여 서약서를 완성해 주세요.
+                최종 탈출 및 연수 이수를 위해 <strong class="text-blue-400">경기도교육청 교직원 음주운전 예방 5대 약속</strong>을 확인하고 본인의 소속 학교와 성명을 입력하세요.
             </p>
 
             <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800 mb-6 space-y-3">
@@ -435,22 +414,21 @@
                 </h4>
                 <ol class="text-xs sm:text-sm text-slate-300 space-y-2 list-decimal list-inside leading-relaxed">
                     <li><strong class="text-slate-100">술을 한 잔이라도 마신 경우 절대로 운전대를 잡지 않는다.</strong></li>
-                    <li><strong class="text-slate-100">늦은 시각 음주 후 다음 날 아침 출근 시에는 대중교통을 이용한다.</strong></li>
+                    <li><strong class="text-slate-100">음주 후 다음 날 아침 출근 시에는 대중교통을 이용한다.</strong></li>
                     <li><strong class="text-slate-100">동료의 음주운전을 적극 제지하고 대리운전을 이용하도록 돕는다.</strong></li>
                     <li><strong class="text-slate-100">음주운전 차량에는 절대로 동승하지 않는다.</strong></li>
-                    <li><strong class="text-slate-100">공직자로서의 청렴과 모범을 지키며 음주운전 근절에 솔선수범한다.</strong></li>
+                    <li><strong class="text-slate-100">공직자로서 청렴과 모범을 지키며 음주운전 근절에 솔선수범한다.</strong></li>
                 </ol>
             </div>
 
-            <!-- Signature Form -->
             <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-800 space-y-4 mb-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">소속 학교명 / 기관명</label>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">소속 학교명 / 기관명 *</label>
                         <input type="text" id="user-school" placeholder="예: 경기초등학교" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">교직원 성명</label>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">교직원 성명 *</label>
                         <input type="text" id="user-name" placeholder="예: 홍길동" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none">
                     </div>
                 </div>
@@ -458,7 +436,7 @@
 
             <button onclick="submitStage5()" class="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-extrabold text-lg rounded-xl transition shadow-lg shadow-green-600/30 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-key"></i>
-                <span>서약 완료 및 최종 탈출 (이수증 발급)</span>
+                <span>서약 완료 및 구글 시트 명단 전송</span>
             </button>
         </div>
 
@@ -469,14 +447,14 @@
 
             <div>
                 <h2 class="text-2xl sm:text-3xl font-black text-white glow-text mb-2">
-                    🎉 탈출 성공! 음주운전 ZERO 미션 클리어
+                    🎉 탈출 성공! 이수 완료
                 </h2>
                 <p class="text-slate-300 text-sm max-w-lg mx-auto">
-                    수고하셨습니다! 경기도교육청 교직원 음주운전 예방 교육 5단계 미션을 모두 완수하셨습니다.
+                    수고하셨습니다! 입력하신 이수 정보가 전달되었습니다.
                 </p>
             </div>
 
-            <!-- Certificate Preview Card -->
+            <!-- Certificate Card -->
             <div id="certificate-card" class="bg-slate-950 p-6 sm:p-8 rounded-2xl border-2 border-amber-500/40 text-slate-200 text-left max-w-2xl mx-auto shadow-2xl relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600"></div>
                 
@@ -504,7 +482,7 @@
                     <div class="flex justify-between items-center text-xs text-slate-400 pt-4 border-t border-slate-800">
                         <div>
                             <span>이수일자: </span>
-                            <span id="cert-date" class="text-slate-200 font-mono">2026. 09. 17</span>
+                            <span id="cert-date" class="text-slate-200 font-mono">2026. 09. 21</span>
                         </div>
                         <div>
                             <span>발급번호: </span>
@@ -513,7 +491,6 @@
                     </div>
                 </div>
 
-                <!-- Footer Seal -->
                 <div class="flex justify-between items-end">
                     <div class="text-xs text-slate-400">
                         <p class="font-bold text-slate-300">경기도교육청 교직원 연수센터</p>
@@ -525,7 +502,6 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row justify-center gap-3 max-w-md mx-auto pt-2">
                 <button onclick="window.print()" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl border border-slate-700 transition flex items-center justify-center gap-2 text-sm">
                     <i class="fa-solid fa-print"></i>
@@ -540,7 +516,7 @@
 
     </main>
 
-    <!-- Custom Modal Notification (Alert Replacement) -->
+    <!-- Custom Modal Notification -->
     <div id="custom-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl space-y-4">
             <div id="modal-icon" class="w-12 h-12 rounded-full flex items-center justify-center mx-auto text-2xl">
@@ -568,17 +544,16 @@
         </div>
     </div>
 
-    <!-- Admin Completion Log Modal -->
     <div id="admin-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
         <div class="bg-slate-900 border border-indigo-500/40 rounded-2xl max-w-2xl w-full p-5 sm:p-6 text-left shadow-2xl flex flex-col max-h-[90vh]">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
                 <div class="flex items-center gap-2">
                     <div class="w-8 h-8 rounded-lg bg-indigo-600/30 text-indigo-400 border border-indigo-500/40 flex items-center justify-center">
-                        <i class="fa-solid fa-clipboard-list text-sm"></i>
+                        <i class="fa-solid fa-file-excel text-green-400 text-sm"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-base text-white">교직원 연수 이수자 관리</h3>
-                        <p class="text-xs text-slate-400">실시간 완료 기록 및 구글 시트 연동 설정</p>
+                        <h3 class="font-bold text-base text-white">구글 시트 연동 & 이수 명단 관리</h3>
+                        <p class="text-xs text-slate-400">실시간 연동 설정 및 이수 기록 다운로드</p>
                     </div>
                 </div>
                 <button onclick="closeAdminModal()" class="text-slate-400 hover:text-white p-1">
@@ -586,41 +561,54 @@
                 </button>
             </div>
 
-            <!-- Webhook Config Block -->
-            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs space-y-2 mb-4">
+            <!-- Webhook Config & Code Block -->
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs space-y-3 mb-4">
                 <div class="flex items-center justify-between text-indigo-300 font-semibold">
                     <span class="flex items-center gap-1.5">
-                        <i class="fa-solid fa-file-excel text-green-400"></i>
-                        <span>구글 시트(Google Apps Script) 자동 연동</span>
+                        <i class="fa-solid fa-link text-indigo-400"></i>
+                        <span>구글 시트 웹앱 URL 연결하기</span>
                     </span>
-                    <button onclick="toggleWebhookHelp()" class="text-slate-400 hover:text-indigo-300 text-[11px] underline">
-                        연동 방법 안내
+                    <button onclick="toggleWebhookHelp()" class="text-amber-400 hover:underline text-[11px] font-medium">
+                        구글 시트 연결방법 가이드 (클릭)
                     </button>
                 </div>
-                <div id="webhook-help-box" class="hidden p-2.5 bg-slate-900 rounded border border-slate-800 text-slate-300 text-[11px] space-y-1">
-                    <p class="font-semibold text-amber-400">💡 구글 시트 1분 연동 3단계:</p>
-                    <p>1. 구글 시트 새 문서 개설 ➔ [확장 프로그램] ➔ [Apps Script] 클릭</p>
-                    <p>2. 기존 코드 지우고 안내문 하단의 스크립트 복사 후 붙여넣기</p>
-                    <p>3. [배포] ➔ [새 배포] ➔ 유형: 웹 앱, 액세스 권한: [모든 사용자] 설정 후 생성된 URL을 아래 입력창에 넣으세요!</p>
+
+                <div id="webhook-help-box" class="p-3 bg-slate-900 rounded-lg border border-slate-800 text-slate-300 text-[11px] space-y-2">
+                    <p class="font-bold text-amber-400">📋 구글 시트에 1분만에 명단 자동 누적하는 방법:</p>
+                    <ol class="list-decimal list-inside space-y-1 text-slate-300">
+                        <li>구글 시트 새 문서 만들기 ➔ 상단 메뉴 [확장 프로그램] ➔ [Apps Script] 클릭</li>
+                        <li>아래 버튼을 눌러 스크립트 코드를 복사한 후 Apps Script 편집기에 그대로 붙여넣고 저장(Ctrl+S)합니다.</li>
+                        <li>우측 상단 [배포] ➔ [새 배포] ➔ 톱니바퀴 클릭 [웹 앱] 선택</li>
+                        <li>설명: <span class="text-slate-400">이수자 수집</span> / 다음 사용자 권한으로 실행: <span class="text-slate-400">나</span> / 액세스 권한: <strong class="text-green-400">모든 사용자(Anyone)</strong> 설정 후 배포!</li>
+                        <li>생성된 <strong>웹 앱 URL</strong>을 아래 입력창에 붙여넣고 [저장] 누르면 끝!</li>
+                    </ol>
+
+                    <div class="pt-2">
+                        <button onclick="copyGoogleScript()" class="w-full py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>구글 시트 전용 Apps Script 코드 복사하기</span>
+                        </button>
+                    </div>
                 </div>
+
                 <div class="flex gap-2">
-                    <input type="url" id="sheet-webhook-input" placeholder="https://script.google.com/macros/s/.../exec" class="flex-grow bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 outline-none focus:border-indigo-500">
-                    <button onclick="saveWebhookUrl()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs shrink-0">
-                        저장
+                    <input type="url" id="sheet-webhook-input" placeholder="https://script.google.com/macros/s/.../exec" class="flex-grow bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 font-mono">
+                    <button onclick="saveWebhookUrl()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs shrink-0">
+                        URL 저장
                     </button>
                 </div>
             </div>
 
             <!-- Completion List Table -->
             <div class="flex items-center justify-between mb-2 text-xs">
-                <span class="text-slate-300 font-semibold">총 이수 인원: <strong id="total-count" class="text-indigo-400">0</strong>명</span>
-                <button onclick="exportToCSV()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg font-bold text-xs flex items-center gap-1.5 transition">
+                <span class="text-slate-300 font-semibold">현재 브라우저 이수 누적: <strong id="total-count" class="text-indigo-400">0</strong>명</span>
+                <button onclick="exportToCSV()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg font-bold text-xs flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-download"></i>
-                    <span>엑셀/구글시트용 CSV 다운로드</span>
+                    <span>엑셀/CSV 다운로드</span>
                 </button>
             </div>
 
-            <div class="flex-grow overflow-y-auto border border-slate-800 rounded-xl bg-slate-950/60 p-2">
+            <div class="flex-grow overflow-y-auto border border-slate-800 rounded-xl bg-slate-950/60 p-2 min-h-[160px]">
                 <table class="w-full text-left text-xs text-slate-300">
                     <thead class="bg-slate-900 text-slate-400 sticky top-0 border-b border-slate-800">
                         <tr>
@@ -654,18 +642,36 @@
         let isAudioEnabled = true;
         let completionLogs = [];
 
-        // Load saved webhook URL on init
+        // Google Apps Script template code
+        const googleScriptTemplate = `function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  sheet.appendRow([data.timestamp, data.school, data.name, data.certCode]);
+  return ContentService.createTextOutput(JSON.stringify({"result": "success"})).setMimeType(ContentService.MimeType.JSON);
+}`;
+
         document.addEventListener('DOMContentLoaded', () => {
             const savedUrl = localStorage.getItem('goe_sheet_webhook') || '';
             const inputEl = document.getElementById('sheet-webhook-input');
             if (inputEl) inputEl.value = savedUrl;
         });
 
+        function copyGoogleScript() {
+            playSound('click');
+            const el = document.createElement('textarea');
+            el.value = googleScriptTemplate;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            showModal("복사 완료", "구글 Apps Script 전용 코드가 클립보드에 복사되었습니다.<br>구글 시트 [확장 프로그램] ➔ [Apps Script] 편집기에 붙여넣으세요!", true);
+        }
+
         function saveWebhookUrl() {
             playSound('click');
             const url = document.getElementById('sheet-webhook-input').value.trim();
             localStorage.setItem('goe_sheet_webhook', url);
-            showModal("저장 완료", "구글 시트 연동 웹앱 URL이 저장되었습니다.", true);
+            showModal("저장 완료", "구글 시트 연동 웹앱 URL이 저장되었습니다.<br>이제 연수를 이수한 교직원의 정보가 해당 구글 시트에 자동으로 쌓입니다.", true);
         }
 
         function toggleWebhookHelp() {
@@ -686,7 +692,7 @@
                 createdAt: Date.now()
             };
 
-            // 1. Save to built-in Firestore
+            // 1. Save to built-in Firestore database
             if (window.db && window.collection && window.addDoc) {
                 try {
                     const appId = window.appId || 'goe-drunk-driving-prevent';
@@ -696,14 +702,14 @@
                 }
             }
 
-            // 2. Send to Google Sheets Apps Script Webhook if configured
+            // 2. Send to Google Sheets Apps Script Webhook
             const webhookUrl = localStorage.getItem('goe_sheet_webhook') || '';
             if (webhookUrl) {
                 try {
                     fetch(webhookUrl, {
                         method: 'POST',
                         mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify(record)
                     }).catch(err => console.log("Webhook fetch bypass:", err));
                 } catch (err) {
@@ -739,13 +745,11 @@
                             completionLogs.push(doc.data());
                         });
 
-                        // Sort by createdAt desc
                         completionLogs.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
                         countEl.textContent = completionLogs.length;
 
                         if (completionLogs.length === 0) {
-                            tableBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">아직 완료한 이수자가 없습니다.</td></tr>`;
+                            tableBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">아직 완료한 이수 기록이 없습니다.</td></tr>`;
                             return;
                         }
 
@@ -811,9 +815,9 @@
                     osc.stop(audioCtx.currentTime + 0.08);
                 } else if (type === 'success') {
                     osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
-                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2);
                     gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
                     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
                     osc.start();
@@ -875,10 +879,10 @@
             const bodyEl = document.getElementById('hint-body');
 
             const hints = {
-                1: "💡 <strong>Stage 1 힌트:</strong><br>도로교통법상 면허 정지 수치는 0.03%입니다(소수점 아래 숫자 '03').<br>면허 취소 기준 수치는 0.08%입니다(소수점 아래 숫자 '08').<br>이 두 숫자를 순서대로 이어 붙이면 암호는 <strong>0308</strong> 입니다.",
+                1: "💡 <strong>Stage 1 힌트:</strong><br>도로교통법상 면허 정지 수치는 0.03%입니다(2자리 숫자 '03').<br>면허 취소 기준 수치는 0.08%입니다(2자리 숫자 '08').<br>이 두 숫자를 순서대로 이어 붙이면 암호는 <strong>0308</strong> 입니다.",
                 2: "💡 <strong>Stage 2 힌트:</strong><br>• 최초 0.08% 이상 ➔ 정직 ~ 강등<br>• 음주측정 거부 ➔ 정직 ~ 파면<br>• 2회 이상 적발 ➔ 강등 ~ 파면",
-                3: "💡 <strong>Stage 3 힌트:</strong><br>C 항목을 유심히 읽어보세요! 경기도교육청 지침상 음주운전으로 적발되면 최초 단속이라도 관내 전보 감점 및 승진 평정 불이익이 즉시 부여됩니다.",
-                4: "💡 <strong>Stage 4 힌트:</strong><br>음주운전을 막는 가장 확실하고 정당한 방법은 술을 마신 사람의 차량 열쇠를 제지하고 대리운전이나 대중교통을 이용하도록 안내하는 것입니다."
+                3: "💡 <strong>Stage 3 힌트:</strong><br>C 항목을 유심히 읽어보세요! 경기도교육청 지침상 음주운전 적발 시 최초 단속이라도 관내 전보 감점 및 승진 평정 불이익이 즉시 부여됩니다.",
+                4: "💡 <strong>Stage 4 힌트:</strong><br>음주운전을 막는 가장 확실하고 정당한 방법은 술을 마신 동료의 차량 열쇠를 제지하고 대리운전이나 대중교통을 이용하도록 돕는 것입니다."
             };
 
             titleEl.textContent = `STAGE ${stage} 미션 힌트`;
@@ -945,7 +949,7 @@
                     goToStage(2);
                 }, 2000);
             } else {
-                showModal("오류: 암호 불일치", "입력한 번호가 틀렸습니다.<br>면허정지 기준(0.03% ➔ 03)과 면허취소 기준(0.08% ➔ 08)을 생각해보세요.", false);
+                showModal("오류: 암호 불일치", "입력한 번호가 틀렸습니다.<br>면허정지 기준(0.03% ➔ 03)과 면허취소 기준(0.08% ➔ 08)을 순서대로 생각해보세요.", false);
             }
         }
 
@@ -1014,7 +1018,6 @@
                 return;
             }
 
-            // Fill Certificate Data
             document.getElementById('cert-school').textContent = schoolInput;
             document.getElementById('cert-name').textContent = nameInput;
 
@@ -1025,16 +1028,14 @@
             const randomCode = `GOE-${today.getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
             document.getElementById('cert-code').textContent = randomCode;
 
-            // Save completion record to Database & Webhook
+            // Save completion record to Database & Google Sheets Webhook
             saveCompletionRecord(schoolInput, nameInput, randomCode);
 
-            // Hide stage 5, show certificate
             document.getElementById('stage-5').classList.add('hidden');
             document.getElementById('screen-clear').classList.remove('hidden');
 
             playSound('success');
 
-            // Trigger Confetti Effect
             if (typeof confetti === 'function') {
                 confetti({
                     particleCount: 100,
