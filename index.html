@@ -3,467 +3,1061 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>경기도교육청 교직원 음주운전 예방교육 - 방탈출 미션</title>
+    <title>비밀의 교무실 : 음주운전 ZERO 미션</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Noto Sans KR) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Setup environment app ID & config
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'goe-drunk-driving-prevent';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyDummyKeyForFallbackOnly",
+            authDomain: "dummy.firebaseapp.com",
+            projectId: "dummy-project",
+            storageBucket: "dummy.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:dummy"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Expose globally for game script
+        window.db = db;
+        window.appId = appId;
+        window.auth = auth;
+        window.addDoc = addDoc;
+        window.collection = collection;
+        window.onSnapshot = onSnapshot;
+
+        // Auto authenticate
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.warn("Auth initialization handled:", err);
+            }
+        }
+        initAuth();
+    </script>
+
     <style>
-        :root {
-            --primary-color: #003366;
-            --secondary-color: #0066cc;
-            --accent-color: #d9534f;
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            user-select: none;
         }
-
-        .container {
-            width: 100%;
-            max-width: 600px;
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-            overflow: hidden;
+        .glow-text {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
         }
-
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 24px 20px;
-            text-align: center;
+        .glow-red {
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
         }
-
-        header h1 {
-            font-size: 1.3rem;
-            margin-bottom: 8px;
+        .bg-glass {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        header p {
-            font-size: 0.9rem;
-            opacity: 0.9;
+        .bg-glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-
-        .progress-bar {
-            height: 8px;
-            background-color: #e0e0e0;
-            width: 100%;
+        .keypad-btn {
+            transition: all 0.15s ease;
         }
-
-        .progress-fill {
-            height: 100%;
-            background-color: var(--secondary-color);
-            width: 20%;
-            transition: width 0.4s ease;
+        .keypad-btn:active {
+            transform: scale(0.92);
         }
-
-        .content-body {
-            padding: 24px 20px;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-
-        .step-card {
-            display: none;
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
         }
-
-        .step-card.active {
-            display: block;
-        }
-
-        .mission-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .info-box {
-            background-color: #eef5fc;
-            border-left: 4px solid var(--secondary-color);
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            font-size: 0.92rem;
-            line-height: 1.6;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        input[type="text"], select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 1rem;
-        }
-
-        .options-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .option-btn {
-            padding: 12px 16px;
-            border: 1px solid #ddd;
-            background-color: #fff;
-            border-radius: 6px;
-            text-align: left;
-            cursor: pointer;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-        }
-
-        .option-btn:hover {
-            background-color: #f0f4f8;
-            border-color: var(--secondary-color);
-        }
-
-        .option-btn.selected {
-            background-color: #e3f2fd;
-            border-color: var(--secondary-color);
-            font-weight: bold;
-        }
-
-        .action-btn {
-            width: 100%;
-            padding: 14px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .action-btn:hover {
-            background-color: #002244;
-        }
-
-        .action-btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        .error-msg {
-            color: var(--accent-color);
-            font-size: 0.85rem;
-            margin-top: 8px;
-            display: none;
-        }
-
-        .cert-card {
-            border: 8px double var(--primary-color);
-            padding: 24px;
-            text-align: center;
-            background-color: #fffdf9;
-            margin-bottom: 20px;
-        }
-
-        .cert-card h2 {
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            margin-bottom: 16px;
-            letter-spacing: 2px;
-        }
-
-        .cert-info {
-            font-size: 0.95rem;
-            line-height: 1.8;
-            margin: 20px 0;
-            text-align: left;
-        }
-
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            .cert-card, .cert-card * {
-                visibility: visible;
-            }
-            .cert-card {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden relative">
 
-<div class="container">
-    <header>
-        <h1>🚪 음주운전 예방교육 방탈출 미션</h1>
-        <p>경기도교육청 교직원 음주운전 근절 미션</p>
-    </header>
-    <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
-    </div>
-
-    <div class="content-body">
-        <!-- Step 0: 사용자 정보 입력 -->
-        <div class="step-card active" id="step0">
-            <div class="mission-title">📋 사용자 확인</div>
-            <div class="info-box">
-                방탈출 미션을 시작하기 전, 이수증 발급을 위한 교직원 정보를 입력해 주세요.
+    <header class="w-full bg-slate-900/90 border-b border-slate-800 sticky top-0 z-40 px-4 py-3 shadow-md">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-lg bg-blue-600/30 border border-blue-500/50 flex items-center justify-center text-blue-400">
+                    <i class="fa-solid fa-lock text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-lg text-slate-100 flex items-center gap-2">
+                        <span>비밀의 교무실</span>
+                        <span class="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded border border-red-500/30 font-medium">경기도교육청</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">교직원 음주운전 예방교육 방탈출</p>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="userName">성명</label>
-                <input type="text" id="userName" placeholder="성함을 입력하세요">
-            </div>
-            <div class="form-group">
-                <label for="userSchool">소속 학교명</label>
-                <input type="text" id="userSchool" placeholder="예: OO초등학교">
-            </div>
-            <button class="action-btn" onclick="startMission()">미션 시작하기</button>
-            <div class="error-msg" id="error0">성명과 소속 학교명을 모두 입력해 주세요.</div>
-        </div>
-
-        <!-- Step 1 -->
-        <div class="step-card" id="step1">
-            <div class="mission-title">🔑 미션 1: 징계 기준 암호 해독</div>
-            <div class="info-box">
-                <b>[경기도교육청 지침]</b><br>
-                혈중알코올농도 <b>0.2% 이상</b>의 최악의 만취 운전으로 최초 적발될 경우 받게 되는 신분상 징계 수위는 무엇일까요?
-            </div>
-            <div class="options-group">
-                <button class="option-btn" onclick="selectOption(1, '견책~감봉')">1. 견책 ~ 감봉</button>
-                <button class="option-btn" onclick="selectOption(1, '정직 1개월~3개월')">2. 정직 1개월 ~ 3개월</button>
-                <button class="option-btn" onclick="selectOption(1, '해임~파면')">3. 해임 ~ 파면</button>
-                <button class="option-btn" onclick="selectOption(1, '강등~해임')">4. 강등 ~ 해임</button>
-            </div>
-            <button class="action-btn" onclick="checkStep1()">잠금 해제</button>
-            <div class="error-msg" id="error1">정답이 아닙니다. 음주운전 신분상 불이익은 매우 엄중합니다!</div>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="step-card" id="step2">
-            <div class="mission-title">🍷 미션 2: 숙취운전 계산기</div>
-            <div class="info-box">
-                전날 밤 늦게까지 술을 마시고 다음 날 아침 출근길에 운전대를 잡았습니다. 숙취운전에 대한 설명 중 <b>옳지 않은 것</b>은?
-            </div>
-            <div class="options-group">
-                <button class="option-btn" onclick="selectOption(2, '1')">1. 자고 일어났어도 체내 알코올 분회가 완료되지 않았다면 음주운전에 해당한다.</button>
-                <button class="option-btn" onclick="selectOption(2, '2')">2. 숙취운전으로 적발되어도 출근길이었으므로 징계 감경 사유가 된다.</button>
-                <button class="option-btn" onclick="selectOption(2, '3')">3. 음주 단속 기준 수치(0.03%) 이상이면 예외 없이 처벌받는다.</button>
-            </div>
-            <button class="action-btn" onclick="checkStep2()">미션 완료</button>
-            <div class="error-msg" id="error2">정답이 아닙니다. 음주운전은 출근길이나 숙취 여부와 상관없이 감경 대상이 아닙니다.</div>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="step-card" id="step3">
-            <div class="mission-title">📉 미션 3: 경제적·재정적 불이익</div>
-            <div class="info-box">
-                음주운전으로 적발될 경우 신분상 징계 외에 따라오는 불이익이 <b>아닌 것</b>은?
-            </div>
-            <div class="options-group">
-                <button class="option-btn" onclick="selectOption(3, '1')">1. 맞춤형 복지점수 차등/제한</button>
-                <button class="option-btn" onclick="selectOption(3, '2')">2. 성과상여금 지급 제외 및 포상 추천 제한</button>
-                <button class="option-btn" onclick="selectOption(3, '3')">3. 교직원 대출 금리 우대 혜택 제공</button>
-                <button class="option-btn" onclick="selectOption(3, '4')">4. 국외연수 및 해외파견 대상 제외</button>
-            </div>
-            <button class="action-btn" onclick="checkStep3()">다음 문 열기</button>
-            <div class="error-msg" id="error3">정답이 아닙니다! 올바른 답을 선택해 주세요.</div>
-        </div>
-
-        <!-- Step 4 -->
-        <div class="step-card" id="step4">
-            <div class="mission-title">🛡️ 미션 4: 동승 및 방조 책임</div>
-            <div class="info-box">
-                동료 교직원이 술을 마신 후 운전하려는 것을 알고도 차에 함께 탑승했거나 열쇠를 건네준 경우 받는 처벌은?
-            </div>
-            <div class="options-group">
-                <button class="option-btn" onclick="selectOption(4, '1')">1. 단순 동승이므로 아무런 처벌이나 징계를 받지 않는다.</button>
-                <button class="option-btn" onclick="selectOption(4, '2')">2. 음주운전 방조죄로 형사처벌 및 교직원 징계 대상이 된다.</button>
-                <button class="option-btn" onclick="selectOption(4, '3')">3. 운전자만 처벌받고 동승자는 주의 조치만 받는다.</button>
-            </div>
-            <button class="action-btn" onclick="checkStep4()">최종 탈출문 열기</button>
-            <div class="error-msg" id="error4">정답이 아닙니다. 음주운전 방조 역시 중대한 범죄입니다.</div>
-        </div>
-
-        <!-- Step 5: 이수증 및 구글 시트 저장 -->
-        <div class="step-card" id="step5">
-            <div class="mission-title">🎉 최종 단계: 음주운전 근절 서약서</div>
             
-            <div class="cert-card" id="certArea">
-                <h2>음 주 운 전 예 방 교 육 이 수 증</h2>
-                <div class="cert-info">
-                    <p><b>성 명:</b> <span id="certName"></span></p>
-                    <p><b>소 속:</b> <span id="certSchool"></span></p>
-                    <p><b>이수일시:</b> <span id="certDate"></span></p>
-                    <p><b>발급번호:</b> <span id="certCode"></span></p>
-                    <br>
-                    <p style="text-align: center; font-weight: bold; font-size: 0.9rem;">
-                        위 사람은 경기도교육청 지침에 따른 교직원 음주운전 예방교육 방탈출 미션을 완료하고, 음주운전 근절을 다짐하였음을 증명합니다.
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <div class="text-right hidden sm:block">
+                    <span class="text-xs text-slate-400">현재 미션</span>
+                    <p id="stage-indicator" class="text-sm font-bold text-blue-400">STAGE 1 / 5</p>
+                </div>
+                <button onclick="openAdminModal()" class="px-2.5 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 text-xs font-semibold transition flex items-center gap-1.5" title="교감선생님 전용 이수자 명단">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span class="hidden sm:inline">이수자 명단</span>
+                </button>
+                <button id="sound-toggle" onclick="toggleAudio()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="음향 효과">
+                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="max-w-4xl mx-auto mt-2 bg-slate-800 h-1.5 rounded-full overflow-hidden">
+            <div id="progress-bar" class="bg-gradient-to-r from-blue-500 to-indigo-500 h-full transition-all duration-500" style="width: 20%;"></div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center my-2">
+
+        <div id="screen-intro" class="bg-glass rounded-2xl p-6 sm:p-8 text-center border border-slate-700 shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg border border-blue-400/30">
+                <i class="fa-solid fa-user-shield text-3xl text-white"></i>
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl font-black mb-3 text-white glow-text">
+                [긴급 미션] 교무실의 비밀 암호를 해독하라!
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base mb-6 max-w-xl mx-auto leading-relaxed">
+                당신은 오늘 퇴근 전, 교직원 연수실에 갇히게 되었습니다.<br class="hidden sm:inline">
+                경기도교육청 음주운전 예방 수칙과 관련 규정에 관한 <strong class="text-blue-400">5단계 단서</strong>를 해결해야만 최종 탈출용 마스터키를 얻을 수 있습니다.
+            </p>
+
+            <div class="bg-slate-900/80 rounded-xl p-4 max-w-lg mx-auto mb-6 border border-slate-800 text-left text-xs sm:text-sm text-slate-300 space-y-2">
+                <div class="flex items-center space-x-2 text-amber-400 font-semibold mb-1">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>방탈출 안내 및 유의사항</span>
+                </div>
+                <p>• 각 단계별 문제와 상황 시나리오를 읽고 퀴즈나 암호를 맞추세요.</p>
+                <p>• 막힐 때는 <span class="text-yellow-400 font-semibold">[힌트 보기]</span> 버튼을 적극 활용할 수 있습니다.</p>
+                <p>• 5단계를 모두 클리어하면 개인 명의의 <strong class="text-green-400">연수 이수 인증서</strong>가 발급됩니다.</p>
+            </div>
+
+            <button onclick="startGame()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-lg rounded-xl shadow-lg shadow-blue-500/25 transition transform active:scale-95 flex items-center justify-center mx-auto space-x-2">
+                <span>미션 개시 (교육 시작하기)</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <div id="stage-1" class="hidden bg-glass rounded-2xl p-5 sm:p-8 border border-slate-700 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-700/80 pb-4 mb-6">
+                <div>
+                    <span class="text-xs font-bold text-blue-400 tracking-wider">MISSION 01</span>
+                    <h3 class="text-xl sm:text-2xl font-extrabold text-white">새벽 출근길의 함정 : 숙취운전</h3>
+                </div>
+                <button onclick="showHint(1)" class="px-3 py-1.5 bg-amber-500/10 border border-amber-500/40 text-amber-300 rounded-lg text-xs font-medium hover:bg-amber-500/20 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-lightbulb"></i> 힌트
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Left: Story Context -->
+                <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-800 text-sm space-y-3">
+                    <div class="p-3 bg-red-950/40 border border-red-500/30 rounded-lg text-red-200 text-xs flex gap-2 items-start">
+                        <i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i>
+                        <div>
+                            <strong>단속 적발 사례:</strong> "어젯밤 11시까지 소주 1병 반을 마시고 자고 일어났으니 아침 7시 출근길엔 괜찮겠지?"
+                        </div>
+                    </div>
+                    <p class="text-slate-300 leading-relaxed">
+                        자고 일어났더라도 체내 알코올 분화 속도는 개인별로 다르며, 아침 숙취 상태 운전 역시 <strong class="text-amber-400">음주운전에 해당</strong>합니다!
                     </p>
+                    <div class="bg-slate-800/80 p-3 rounded-lg border border-slate-700">
+                        <h4 class="font-semibold text-xs text-blue-300 mb-1">🔍 음주운전 단속 기준 (도로교통법)</h4>
+                        <ul class="text-xs text-slate-300 space-y-1">
+                            <li>• 면허 정지 기준: 혈중알코올농도 <strong class="text-yellow-400">0.03%</strong> 이상</li>
+                            <li>• 면허 취소 기준: 혈중알코올농도 <strong class="text-red-400">0.08%</strong> 이상</li>
+                        </ul>
+                    </div>
+                    <div class="text-xs text-slate-400 italic">
+                        [문제] 도로교통법상 음주운전 단속 대상인 <span class="text-slate-200 font-bold">"면허 정지 최소 혈중알코올농도 수치(소수점 아래 두 자리 숫자를 백분율 수치화한 두 자리)"</span>와 <span class="text-slate-200 font-bold">"면허 취소 최소 수치"</span>를 순서대로 조합하여 4자리 암호를 입력하세요.
+                    </div>
+                </div>
+
+                <!-- Right: Interactive Keypad -->
+                <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800 flex flex-col justify-center items-center">
+                    <p class="text-xs text-slate-400 mb-2">전자 도어락 암호 입력 (4자리)</p>
+                    
+                    <div id="stage1-display" class="w-full max-w-[240px] bg-slate-950 border-2 border-blue-500/50 rounded-xl p-3 text-center text-3xl font-mono font-bold tracking-widest text-blue-400 mb-4 h-14 flex items-center justify-center shadow-inner">
+                        ----
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 w-full max-w-[240px]">
+                        <button onclick="pressKey(1, '0')" class="keypad-btn p-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-bold text-lg text-slate-200 border border-slate-700">0</button>
+                        <button onclick="pressKey(1, '3')" class="keypad-btn p-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-bold text-lg text-slate-200 border border-slate-700">3</button>
+                        <button onclick="pressKey(1, '5')" class="keypad-btn p-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-bold text-lg text-slate-200 border border-slate-700">5</button>
+                        <button onclick="pressKey(1, '8')" class="keypad-btn p-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-bold text-lg text-slate-200 border border-slate-700">8</button>
+                        <button onclick="pressKey(1, '1')" class="keypad-btn p-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-bold text-lg text-slate-200 border border-slate-700">1</button>
+                        <button onclick="pressKey(1, '2')" class="keypad-btn p-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-bold text-lg text-slate-200 border border-slate-700">2</button>
+                        <button onclick="clearKey(1)" class="keypad-btn p-3 bg-red-900/40 hover:bg-red-800/50 text-red-300 rounded-lg font-bold text-sm border border-red-700/50">C</button>
+                        <button onclick="pressKey(1, '7')" class="keypad-btn p-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-bold text-lg text-slate-200 border border-slate-700">7</button>
+                        <button onclick="submitStage1()" class="keypad-btn p-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold text-sm border border-blue-400">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="stage-2" class="hidden bg-glass rounded-2xl p-5 sm:p-8 border border-slate-700 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-700/80 pb-4 mb-6">
+                <div>
+                    <span class="text-xs font-bold text-blue-400 tracking-wider">MISSION 02</span>
+                    <h3 class="text-xl sm:text-2xl font-extrabold text-white">교직원 징계 기준 퍼즐</h3>
+                </div>
+                <button onclick="showHint(2)" class="px-3 py-1.5 bg-amber-500/10 border border-amber-500/40 text-amber-300 rounded-lg text-xs font-medium hover:bg-amber-500/20 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-lightbulb"></i> 힌트
+                </button>
+            </div>
+
+            <p class="text-xs sm:text-sm text-slate-300 mb-4">
+                경기도교육청 교직원 음주운전 징계양정 기준에 맞게 <strong class="text-blue-400">[음주운전 유형]</strong>과 <strong class="text-indigo-400">[최소 징계 수위]</strong>를 올바르게 연결하세요.
+            </p>
+
+            <div class="space-y-3 mb-6" id="match-quiz-container">
+                <!-- Case 1 -->
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="text-xs sm:text-sm text-slate-200 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-900/50 text-blue-400 border border-blue-700/50 flex items-center justify-center font-bold text-xs shrink-0">1</span>
+                        <span>최초 음주운전 (혈중알코올농도 0.08% 이상)</span>
+                    </div>
+                    <select id="stage2-q1" class="bg-slate-800 text-xs sm:text-sm text-slate-200 rounded-lg border border-slate-700 p-2.5 w-full sm:w-48 focus:border-blue-500 outline-none">
+                        <option value="">-- 징계 수위 선택 --</option>
+                        <option value="견책">견책 ~ 감봉</option>
+                        <option value="정직">정직 ~ 강등</option>
+                        <option value="파면">해임 ~ 파면</option>
+                    </select>
+                </div>
+
+                <!-- Case 2 -->
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="text-xs sm:text-sm text-slate-200 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-900/50 text-blue-400 border border-blue-700/50 flex items-center justify-center font-bold text-xs shrink-0">2</span>
+                        <span>음주측정 거부</span>
+                    </div>
+                    <select id="stage2-q2" class="bg-slate-800 text-xs sm:text-sm text-slate-200 rounded-lg border border-slate-700 p-2.5 w-full sm:w-48 focus:border-blue-500 outline-none">
+                        <option value="">-- 징계 수위 선택 --</option>
+                        <option value="견책">감봉 ~ 견책</option>
+                        <option value="정직">정직 ~ 파면</option>
+                        <option value="경고">불문경고</option>
+                    </select>
+                </div>
+
+                <!-- Case 3 -->
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="text-xs sm:text-sm text-slate-200 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-900/50 text-blue-400 border border-blue-700/50 flex items-center justify-center font-bold text-xs shrink-0">3</span>
+                        <span>2회 이상 음주운전 또는 음주운전 운전면허 정지·취소 상태에서 운전</span>
+                    </div>
+                    <select id="stage2-q3" class="bg-slate-800 text-xs sm:text-sm text-slate-200 rounded-lg border border-slate-700 p-2.5 w-full sm:w-48 focus:border-blue-500 outline-none">
+                        <option value="">-- 징계 수위 선택 --</option>
+                        <option value="정직">정직 ~ 강등</option>
+                        <option value="파면">강등 ~ 파면</option>
+                        <option value="감봉">감봉 ~ 견책</option>
+                    </select>
                 </div>
             </div>
 
-            <button class="action-btn" id="submitBtn" onclick="finishAndSave()" style="margin-bottom: 10px;">서약 완료 및 이수 기록 제출</button>
-            <button class="action-btn" onclick="window.print()" style="background-color: #555;">이수증 인쇄 / PDF 저장</button>
-            <div class="error-msg" id="saveStatus" style="text-align: center; font-weight: bold; margin-top: 10px;"></div>
+            <button onclick="submitStage2()" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl transition shadow-md">
+                징계 기준 검증 및 잠금 해제
+            </button>
+        </div>
+
+        <div id="stage-3" class="hidden bg-glass rounded-2xl p-5 sm:p-8 border border-slate-700 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-700/80 pb-4 mb-6">
+                <div>
+                    <span class="text-xs font-bold text-blue-400 tracking-wider">MISSION 03</span>
+                    <h3 class="text-xl sm:text-2xl font-extrabold text-white">숨겨진 연쇄 불이익 금고</h3>
+                </div>
+                <button onclick="showHint(3)" class="px-3 py-1.5 bg-amber-500/10 border border-amber-500/40 text-amber-300 rounded-lg text-xs font-medium hover:bg-amber-500/20 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-lightbulb"></i> 힌트
+                </button>
+            </div>
+
+            <div class="bg-slate-900/70 p-4 rounded-xl border border-slate-800 mb-6 text-xs sm:text-sm leading-relaxed text-slate-300">
+                <p class="mb-2">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-400 mr-1"></i>
+                    음주운전 적발 시, 단순 징계 처분으로 끝나는 것이 아닙니다! 교직원 신분상·재정상 <strong class="text-red-400">엄중한 연쇄 불이익</strong>이 따라옵니다.
+                </p>
+                <p class="text-slate-400">다음 중 경기도교육청 교직원이 음주운전으로 적발되었을 때 받게 되는 불이익에 대한 설명으로 <span class="text-red-400 font-bold underline">올바르지 않은 것 하나</span>를 찾아 금고를 해제하세요.</p>
+            </div>
+
+            <div class="space-y-3 mb-6" id="stage3-options">
+                <label class="block bg-slate-900/90 p-4 rounded-xl border border-slate-800 hover:border-slate-600 transition cursor-pointer">
+                    <div class="flex items-start gap-3">
+                        <input type="radio" name="stage3-choice" value="1" class="mt-1 accent-blue-500">
+                        <div class="text-xs sm:text-sm text-slate-200">
+                            <strong>A.</strong> 맞춤형 복지비(복지포인트) 감축 및 성과상여금 지급 평가 시 감점/최하위 등급 지정 등 경제적 불이익이 발생한다.
+                        </div>
+                    </div>
+                </label>
+
+                <label class="block bg-slate-900/90 p-4 rounded-xl border border-slate-800 hover:border-slate-600 transition cursor-pointer">
+                    <div class="flex items-start gap-3">
+                        <input type="radio" name="stage3-choice" value="2" class="mt-1 accent-blue-500">
+                        <div class="text-xs sm:text-sm text-slate-200">
+                            <strong>B.</strong> 국외연수 대상자 추천 제외, 모범공무원 및 각종 포상 추천 대상에서 제외된다.
+                        </div>
+                    </div>
+                </label>
+
+                <label class="block bg-slate-900/90 p-4 rounded-xl border border-slate-800 hover:border-slate-600 transition cursor-pointer">
+                    <div class="flex items-start gap-3">
+                        <input type="radio" name="stage3-choice" value="3" class="mt-1 accent-blue-500">
+                        <div class="text-xs sm:text-sm text-slate-200">
+                            <strong>C.</strong> 최초 0.03% 이상 적발 시라도 단순 실수로 인정되어 교원 전보나 관내 만기 전보 시 아무런 감점 불이익이 없다.
+                        </div>
+                    </div>
+                </label>
+
+                <label class="block bg-slate-900/90 p-4 rounded-xl border border-slate-800 hover:border-slate-600 transition cursor-pointer">
+                    <div class="flex items-start gap-3">
+                        <input type="radio" name="stage3-choice" value="4" class="mt-1 accent-blue-500">
+                        <div class="text-xs sm:text-sm text-slate-200">
+                            <strong>D.</strong> 승진 가산점 제외 및 근무성적평정 시 신분상 불이익 반영으로 교감/교장 승진에 결정적 장애가 된다.
+                        </div>
+                    </div>
+                </label>
+            </div>
+
+            <button onclick="submitStage3()" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl transition shadow-md">
+                오류 항목 선택 및 금고 해제
+            </button>
+        </div>
+
+        <div id="stage-4" class="hidden bg-glass rounded-2xl p-5 sm:p-8 border border-slate-700 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-700/80 pb-4 mb-6">
+                <div>
+                    <span class="text-xs font-bold text-blue-400 tracking-wider">MISSION 04</span>
+                    <h3 class="text-xl sm:text-2xl font-extrabold text-white">방조와 동승의 딜레마</h3>
+                </div>
+                <button onclick="showHint(4)" class="px-3 py-1.5 bg-amber-500/10 border border-amber-500/40 text-amber-300 rounded-lg text-xs font-medium hover:bg-amber-500/20 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-lightbulb"></i> 힌트
+                </button>
+            </div>
+
+            <!-- Scenario Card -->
+            <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800 mb-6 text-xs sm:text-sm">
+                <div class="flex items-center gap-2 text-amber-400 font-bold mb-2">
+                    <i class="fa-solid fa-users text-base"></i>
+                    <span>시나리오 상황 판단</span>
+                </div>
+                <p class="text-slate-300 leading-relaxed mb-3">
+                    교직원 회식 후, 동료 교사 A씨가 술을 마신 상태에서 "집이 가까우니 내 차로 데려다주겠다"며 차 열쇠를 집어 들었습니다.<br>
+                    이 상황에서 함께 있던 동료들의 대처 중 <strong class="text-green-400">형사처벌(음주운전 방조죄) 및 징계 대상이 되지 않는 올바른 대처</strong>는 무엇일까요?
+                </p>
+
+                <div class="bg-amber-950/30 border border-amber-500/20 p-3 rounded-lg text-amber-200 text-xs">
+                    💡 <strong>참고:</strong> 음주운전임을 알면서도 차 열쇠를 제공하거나, 음주운전을 권유 및 방조하고, 차량에 동승한 경우 형법상 <strong>'음주운전 방조죄'</strong>로 처벌받을 수 있습니다.
+                </div>
+            </div>
+
+            <!-- Quiz Choices -->
+            <div class="space-y-3 mb-6" id="stage4-options">
+                <label class="block bg-slate-900/80 p-4 rounded-xl border border-slate-800 hover:border-slate-600 transition cursor-pointer">
+                    <div class="flex items-start gap-3">
+                        <input type="radio" name="stage4-choice" value="1" class="mt-1 accent-blue-500">
+                        <div class="text-xs sm:text-sm text-slate-200">
+                            ① A씨가 술을 마셨음을 알지만, 운전실력을 믿고 조용히 뒷좌석에 함께 타서 귀가한다.
+                        </div>
+                    </div>
+                </label>
+
+                <label class="block bg-slate-900/80 p-4 rounded-xl border border-slate-800 hover:border-slate-600 transition cursor-pointer">
+                    <div class="flex items-start gap-3">
+                        <input type="radio" name="stage4-choice" value="2" class="mt-1 accent-blue-500">
+                        <div class="text-xs sm:text-sm text-slate-200">
+                            ② 적극적으로 A씨의 차량 열쇠를 빼앗아 안전하게 대리운전을 직접 호출해주거나 대중교통을 이용하도록 조치한다.
+                        </div>
+                    </div>
+                </label>
+
+                <label class="block bg-slate-900/80 p-4 rounded-xl border border-slate-800 hover:border-slate-600 transition cursor-pointer">
+                    <div class="flex items-start gap-3">
+                        <input type="radio" name="stage4-choice" value="3" class="mt-1 accent-blue-500">
+                        <div class="text-xs sm:text-sm text-slate-200">
+                            ③ A씨에게 차 키를 건네주며 "단속 안 하는 골목길로 조심히 가라"고 말해준다.
+                        </div>
+                    </div>
+                </label>
+            </div>
+
+            <button onclick="submitStage4()" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl transition shadow-md">
+                올바른 대처 선택
+            </button>
+        </div>
+
+        <div id="stage-5" class="hidden bg-glass rounded-2xl p-5 sm:p-8 border border-slate-700 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-700/80 pb-4 mb-6">
+                <div>
+                    <span class="text-xs font-bold text-green-400 tracking-wider">FINAL MISSION</span>
+                    <h3 class="text-xl sm:text-2xl font-extrabold text-white">음주운전 ZERO 서약서 작성</h3>
+                </div>
+            </div>
+
+            <p class="text-xs sm:text-sm text-slate-300 mb-6 leading-relaxed">
+                축하합니다! 4개 미션을 완수하여 교무실 마스터키의 80%를 확보했습니다.<br>
+                최종 탈출을 위해 <strong class="text-blue-400">경기도교육청 교직원 음주운전 예방 5대 약속</strong>을 확인하고 본인의 성명과 소속 학교명을 입력하여 서약서를 완성해 주세요.
+            </p>
+
+            <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800 mb-6 space-y-3">
+                <h4 class="font-bold text-sm text-amber-400 border-b border-slate-800 pb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-file-contract"></i>
+                    <span>경기도교육청 교직원 음주운전 ZERO 5대 약속</span>
+                </h4>
+                <ol class="text-xs sm:text-sm text-slate-300 space-y-2 list-decimal list-inside leading-relaxed">
+                    <li><strong class="text-slate-100">술을 한 잔이라도 마신 경우 절대로 운전대를 잡지 않는다.</strong></li>
+                    <li><strong class="text-slate-100">늦은 시각 음주 후 다음 날 아침 출근 시에는 대중교통을 이용한다.</strong></li>
+                    <li><strong class="text-slate-100">동료의 음주운전을 적극 제지하고 대리운전을 이용하도록 돕는다.</strong></li>
+                    <li><strong class="text-slate-100">음주운전 차량에는 절대로 동승하지 않는다.</strong></li>
+                    <li><strong class="text-slate-100">공직자로서의 청렴과 모범을 지키며 음주운전 근절에 솔선수범한다.</strong></li>
+                </ol>
+            </div>
+
+            <!-- Signature Form -->
+            <div class="bg-slate-900/60 p-4 sm:p-5 rounded-xl border border-slate-800 space-y-4 mb-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">소속 학교명 / 기관명</label>
+                        <input type="text" id="user-school" placeholder="예: 경기초등학교" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">교직원 성명</label>
+                        <input type="text" id="user-name" placeholder="예: 홍길동" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="submitStage5()" class="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-extrabold text-lg rounded-xl transition shadow-lg shadow-green-600/30 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-key"></i>
+                <span>서약 완료 및 최종 탈출 (이수증 발급)</span>
+            </button>
+        </div>
+
+        <div id="screen-clear" class="hidden bg-glass rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-2xl text-center space-y-6">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-green-500/20 border-2 border-green-500 text-green-400 rounded-full text-4xl mb-2 animate-bounce">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+
+            <div>
+                <h2 class="text-2xl sm:text-3xl font-black text-white glow-text mb-2">
+                    🎉 탈출 성공! 음주운전 ZERO 미션 클리어
+                </h2>
+                <p class="text-slate-300 text-sm max-w-lg mx-auto">
+                    수고하셨습니다! 경기도교육청 교직원 음주운전 예방 교육 5단계 미션을 모두 완수하셨습니다.
+                </p>
+            </div>
+
+            <!-- Certificate Preview Card -->
+            <div id="certificate-card" class="bg-slate-950 p-6 sm:p-8 rounded-2xl border-2 border-amber-500/40 text-slate-200 text-left max-w-2xl mx-auto shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600"></div>
+                
+                <div class="text-center mb-6">
+                    <p class="text-xs font-semibold tracking-widest text-amber-400 uppercase mb-1">Certificate of Completion</p>
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-100 font-serif">음주운전 예방교육 이수증</h3>
+                </div>
+
+                <div class="space-y-4 text-xs sm:text-sm mb-8 leading-relaxed">
+                    <div class="grid grid-cols-2 gap-4 bg-slate-900/80 p-3.5 rounded-lg border border-slate-800">
+                        <div>
+                            <span class="text-slate-400 block text-xs">소 속</span>
+                            <span id="cert-school" class="font-bold text-slate-100 text-base">경기초등학교</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-xs">성 명</span>
+                            <span id="cert-name" class="font-bold text-slate-100 text-base">홍길동</span>
+                        </div>
+                    </div>
+
+                    <p class="text-slate-300 pt-2 text-center">
+                        위 사람은 경기도교육청 교직원 음주운전 예방 교육 및 방탈출 미션을 성실히 수행하였으며, 음주운전 ZERO 5대 수칙을 준수할 것을 서약하였으므로 본 이수증을 수여합니다.
+                    </p>
+
+                    <div class="flex justify-between items-center text-xs text-slate-400 pt-4 border-t border-slate-800">
+                        <div>
+                            <span>이수일자: </span>
+                            <span id="cert-date" class="text-slate-200 font-mono">2026. 09. 17</span>
+                        </div>
+                        <div>
+                            <span>발급번호: </span>
+                            <span id="cert-code" class="text-amber-400 font-mono font-bold">GOE-2026-9912</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Seal -->
+                <div class="flex justify-between items-end">
+                    <div class="text-xs text-slate-400">
+                        <p class="font-bold text-slate-300">경기도교육청 교직원 연수센터</p>
+                        <p>음주운전 예방교육 방탈출 프로그램</p>
+                    </div>
+                    <div class="w-16 h-16 rounded-full border-2 border-red-500/80 text-red-500/90 flex items-center justify-center font-bold text-xs rotate-[15deg] shadow-lg bg-red-950/20">
+                        <span class="text-[10px] text-center">음주운전<br>ZERO</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row justify-center gap-3 max-w-md mx-auto pt-2">
+                <button onclick="window.print()" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl border border-slate-700 transition flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-print"></i>
+                    <span>이수증 인쇄 / PDF 저장</span>
+                </button>
+                <button onclick="resetGame()" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>처음부터 다시하기</span>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Custom Modal Notification (Alert Replacement) -->
+    <div id="custom-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl space-y-4">
+            <div id="modal-icon" class="w-12 h-12 rounded-full flex items-center justify-center mx-auto text-2xl">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 id="modal-title" class="text-lg font-bold text-white"></h3>
+            <p id="modal-body" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></p>
+            <button onclick="closeModal()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm transition">
+                확인
+            </button>
         </div>
     </div>
-</div>
 
-<script>
-    // ================================================================
-    // [구글 앱스 스크립트 URL] 교감선생님의 앱스 스크립트 배포 URL을 넣어주세요!
-    // ================================================================
-    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxBYrRJK_wEgewlofj9Q_izhgLUKNefnYLDLmZ_iMmXVW_Gidfl8Rhy2T-cxJCBOvAh/exec"; 
+    <!-- Hint Modal -->
+    <div id="hint-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+        <div class="bg-slate-900 border border-amber-500/40 rounded-2xl max-w-md w-full p-6 text-left shadow-2xl space-y-4">
+            <div class="flex items-center gap-2 text-amber-400 font-bold text-base border-b border-slate-800 pb-3">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span id="hint-title">단계별 단서 힌트</span>
+            </div>
+            <p id="hint-body" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></p>
+            <button onclick="closeHintModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg text-sm border border-slate-700 transition">
+                닫기
+            </button>
+        </div>
+    </div>
 
-    let userData = {
-        name: '',
-        school: '',
-        answers: {}
-    };
+    <!-- Admin Completion Log Modal -->
+    <div id="admin-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <div class="bg-slate-900 border border-indigo-500/40 rounded-2xl max-w-2xl w-full p-5 sm:p-6 text-left shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-600/30 text-indigo-400 border border-indigo-500/40 flex items-center justify-center">
+                        <i class="fa-solid fa-clipboard-list text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base text-white">교직원 연수 이수자 관리</h3>
+                        <p class="text-xs text-slate-400">실시간 완료 기록 및 구글 시트 연동 설정</p>
+                    </div>
+                </div>
+                <button onclick="closeAdminModal()" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
 
-    function startMission() {
-        const name = document.getElementById('userName').value.trim();
-        const school = document.getElementById('userSchool').value.trim();
+            <!-- Webhook Config Block -->
+            <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs space-y-2 mb-4">
+                <div class="flex items-center justify-between text-indigo-300 font-semibold">
+                    <span class="flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-excel text-green-400"></i>
+                        <span>구글 시트(Google Apps Script) 자동 연동</span>
+                    </span>
+                    <button onclick="toggleWebhookHelp()" class="text-slate-400 hover:text-indigo-300 text-[11px] underline">
+                        연동 방법 안내
+                    </button>
+                </div>
+                <div id="webhook-help-box" class="hidden p-2.5 bg-slate-900 rounded border border-slate-800 text-slate-300 text-[11px] space-y-1">
+                    <p class="font-semibold text-amber-400">💡 구글 시트 1분 연동 3단계:</p>
+                    <p>1. 구글 시트 새 문서 개설 ➔ [확장 프로그램] ➔ [Apps Script] 클릭</p>
+                    <p>2. 기존 코드 지우고 안내문 하단의 스크립트 복사 후 붙여넣기</p>
+                    <p>3. [배포] ➔ [새 배포] ➔ 유형: 웹 앱, 액세스 권한: [모든 사용자] 설정 후 생성된 URL을 아래 입력창에 넣으세요!</p>
+                </div>
+                <div class="flex gap-2">
+                    <input type="url" id="sheet-webhook-input" placeholder="https://script.google.com/macros/s/.../exec" class="flex-grow bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 outline-none focus:border-indigo-500">
+                    <button onclick="saveWebhookUrl()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs shrink-0">
+                        저장
+                    </button>
+                </div>
+            </div>
 
-        if(!name || !school) {
-            document.getElementById('error0').style.display = 'block';
-            return;
-        }
+            <!-- Completion List Table -->
+            <div class="flex items-center justify-between mb-2 text-xs">
+                <span class="text-slate-300 font-semibold">총 이수 인원: <strong id="total-count" class="text-indigo-400">0</strong>명</span>
+                <button onclick="exportToCSV()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg font-bold text-xs flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-download"></i>
+                    <span>엑셀/구글시트용 CSV 다운로드</span>
+                </button>
+            </div>
 
-        userData.name = name;
-        userData.school = school;
-        document.getElementById('error0').style.display = 'none';
+            <div class="flex-grow overflow-y-auto border border-slate-800 rounded-xl bg-slate-950/60 p-2">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="bg-slate-900 text-slate-400 sticky top-0 border-b border-slate-800">
+                        <tr>
+                            <th class="p-2">완료 일시</th>
+                            <th class="p-2">소속 학교</th>
+                            <th class="p-2">성명</th>
+                            <th class="p-2">발급 번호</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completion-table-body" class="divide-y divide-slate-800/60 font-mono">
+                        <tr>
+                            <td colspan="4" class="p-4 text-center text-slate-500 italic">이수 기록을 불러오는 중...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        goToStep(1);
-    }
+            <button onclick="closeAdminModal()" class="w-full mt-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs border border-slate-700 transition">
+                닫기
+            </button>
+        </div>
+    </div>
 
-    function selectOption(step, val) {
-        userData.answers[step] = val;
-        const btns = document.querySelectorAll(`#step${step} .option-btn`);
-        btns.forEach(btn => btn.classList.remove('selected'));
-        event.target.classList.add('selected');
-    }
+    <footer class="w-full py-4 bg-slate-950 border-t border-slate-900 text-center text-xs text-slate-500">
+        경기도교육청 교직원 음주운전 예방 교육 | 안전하고 청렴한 경기교육
+    </footer>
 
-    function goToStep(stepNum) {
-        document.querySelectorAll('.step-card').forEach(card => card.classList.remove('active'));
-        document.getElementById(`step${stepNum}`).classList.add('active');
-        document.getElementById('progressFill').style.width = `${(stepNum / 5) * 100}%`;
-    }
+    <script>
+        let currentStage = 0;
+        let stage1Input = "";
+        let isAudioEnabled = true;
+        let completionLogs = [];
 
-    function checkStep1() {
-        if (userData.answers[1] === '강등~해임') {
-            document.getElementById('error1').style.display = 'none';
-            goToStep(2);
-        } else {
-            document.getElementById('error1').style.display = 'block';
-        }
-    }
-
-    function checkStep2() {
-        if (userData.answers[2] === '2') {
-            document.getElementById('error2').style.display = 'none';
-            goToStep(3);
-        } else {
-            document.getElementById('error2').style.display = 'block';
-        }
-    }
-
-    function checkStep3() {
-        if (userData.answers[3] === '3') {
-            document.getElementById('error3').style.display = 'none';
-            goToStep(4);
-        } else {
-            document.getElementById('error3').style.display = 'block';
-        }
-    }
-
-    function checkStep4() {
-        if (userData.answers[4] === '2') {
-            document.getElementById('error4').style.display = 'none';
-            
-            const now = new Date();
-            const dateStr = now.getFullYear() + '년 ' + (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-            const codeStr = 'GOE-' + Math.floor(100000 + Math.random() * 900000);
-
-            document.getElementById('certName').innerText = userData.name;
-            document.getElementById('certSchool').innerText = userData.school;
-            document.getElementById('certDate').innerText = dateStr;
-            document.getElementById('certCode').innerText = codeStr;
-
-            userData.timestamp = dateStr;
-            userData.certCode = codeStr;
-
-            goToStep(5);
-        } else {
-            document.getElementById('error4').style.display = 'block';
-        }
-    }
-
-    function finishAndSave() {
-        const statusDiv = document.getElementById('saveStatus');
-        const submitBtn = document.getElementById('submitBtn');
-
-        statusDiv.style.display = 'block';
-        statusDiv.style.color = '#0066cc';
-        statusDiv.innerText = '구글 시트로 이수 기록을 전송 중입니다...';
-        submitBtn.disabled = true;
-
-        if (!GOOGLE_SHEET_URL || GOOGLE_SHEET_URL.includes("YOUR_SCRIPT_ID_HERE")) {
-            statusDiv.style.color = '#d9534f';
-            statusDiv.innerText = '⚠️ 구글 시트 URL 설정이 빠졌습니다. GOOGLE_SHEET_URL 변수를 확인해 주세요.';
-            submitBtn.disabled = false;
-            return;
-        }
-
-        fetch(GOOGLE_SHEET_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                timestamp: userData.timestamp,
-                school: userData.school,
-                name: userData.name,
-                certCode: userData.certCode
-            })
-        })
-        .then(() => {
-            statusDiv.style.color = '#2e7d32';
-            statusDiv.innerText = '✅ 이수 제출이 완료되었습니다!';
-        })
-        .catch(err => {
-            statusDiv.style.color = '#d9534f';
-            statusDiv.innerText = '❌ 전송 실패: 인터넷 연결 상태를 확인해 주세요.';
-            submitBtn.disabled = false;
+        // Load saved webhook URL on init
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedUrl = localStorage.getItem('goe_sheet_webhook') || '';
+            const inputEl = document.getElementById('sheet-webhook-input');
+            if (inputEl) inputEl.value = savedUrl;
         });
-    }
-</script>
 
+        function saveWebhookUrl() {
+            playSound('click');
+            const url = document.getElementById('sheet-webhook-input').value.trim();
+            localStorage.setItem('goe_sheet_webhook', url);
+            showModal("저장 완료", "구글 시트 연동 웹앱 URL이 저장되었습니다.", true);
+        }
+
+        function toggleWebhookHelp() {
+            playSound('click');
+            const box = document.getElementById('webhook-help-box');
+            box.classList.toggle('hidden');
+        }
+
+        async function saveCompletionRecord(school, name, certCode) {
+            const now = new Date();
+            const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            
+            const record = {
+                school: school,
+                name: name,
+                certCode: certCode,
+                timestamp: timestamp,
+                createdAt: Date.now()
+            };
+
+            // 1. Save to built-in Firestore
+            if (window.db && window.collection && window.addDoc) {
+                try {
+                    const appId = window.appId || 'goe-drunk-driving-prevent';
+                    await window.addDoc(window.collection(window.db, 'artifacts', appId, 'public', 'data', 'completions'), record);
+                } catch (e) {
+                    console.warn("Database record error:", e);
+                }
+            }
+
+            // 2. Send to Google Sheets Apps Script Webhook if configured
+            const webhookUrl = localStorage.getItem('goe_sheet_webhook') || '';
+            if (webhookUrl) {
+                try {
+                    fetch(webhookUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(record)
+                    }).catch(err => console.log("Webhook fetch bypass:", err));
+                } catch (err) {
+                    console.log("Webhook send error:", err);
+                }
+            }
+        }
+
+        function openAdminModal() {
+            playSound('click');
+            document.getElementById('admin-modal').classList.remove('hidden');
+            subscribeCompletionLogs();
+        }
+
+        function closeAdminModal() {
+            playSound('click');
+            document.getElementById('admin-modal').classList.add('hidden');
+        }
+
+        function subscribeCompletionLogs() {
+            if (!window.db || !window.collection || !window.onSnapshot) return;
+            
+            const appId = window.appId || 'goe-drunk-driving-prevent';
+            const tableBody = document.getElementById('completion-table-body');
+            const countEl = document.getElementById('total-count');
+
+            try {
+                window.onSnapshot(
+                    window.collection(window.db, 'artifacts', appId, 'public', 'data', 'completions'),
+                    (snapshot) => {
+                        completionLogs = [];
+                        snapshot.forEach(doc => {
+                            completionLogs.push(doc.data());
+                        });
+
+                        // Sort by createdAt desc
+                        completionLogs.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                        countEl.textContent = completionLogs.length;
+
+                        if (completionLogs.length === 0) {
+                            tableBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">아직 완료한 이수자가 없습니다.</td></tr>`;
+                            return;
+                        }
+
+                        tableBody.innerHTML = completionLogs.map(item => `
+                            <tr class="hover:bg-slate-900/50 transition">
+                                <td class="p-2 text-slate-400">${item.timestamp || '-'}</td>
+                                <td class="p-2 text-slate-200 font-sans font-medium">${item.school || '-'}</td>
+                                <td class="p-2 text-indigo-300 font-sans font-semibold">${item.name || '-'}</td>
+                                <td class="p-2 text-amber-400 text-[11px]">${item.certCode || '-'}</td>
+                            </tr>
+                        `).join('');
+                    },
+                    (error) => {
+                        console.warn("Snapshot error:", error);
+                    }
+                );
+            } catch (err) {
+                console.warn("Subscription error:", err);
+            }
+        }
+
+        function exportToCSV() {
+            playSound('click');
+            if (completionLogs.length === 0) {
+                showModal("알림", "다운로드할 이수 기록이 없습니다.", false);
+                return;
+            }
+
+            let csvContent = "\uFEFF완료일시,소속학교,성명,이수증발급번호\n";
+            completionLogs.forEach(row => {
+                csvContent += `"${row.timestamp || ''}","${row.school || ''}","${row.name || ''}","${row.certCode || ''}"\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `교직원_음주운전예방교육_이수명단_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!isAudioEnabled) return;
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.08);
+                } else if (type === 'success') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                } else if (type === 'error') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(130, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                }
+            } catch (e) {
+                console.log("Audio play error", e);
+            }
+        }
+
+        function toggleAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            const icon = document.getElementById('sound-icon');
+            if (isAudioEnabled) {
+                icon.className = 'fa-solid fa-volume-high';
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-slate-500';
+            }
+        }
+
+        function showModal(title, body, isSuccess = true) {
+            playSound(isSuccess ? 'success' : 'error');
+            const modal = document.getElementById('custom-modal');
+            const icon = document.getElementById('modal-icon');
+            const titleEl = document.getElementById('modal-title');
+            const bodyEl = document.getElementById('modal-body');
+
+            titleEl.textContent = title;
+            bodyEl.innerHTML = body;
+
+            if (isSuccess) {
+                icon.className = 'w-12 h-12 rounded-full flex items-center justify-center mx-auto text-2xl bg-green-500/20 text-green-400 border border-green-500/40';
+                icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+            } else {
+                icon.className = 'w-12 h-12 rounded-full flex items-center justify-center mx-auto text-2xl bg-red-500/20 text-red-400 border border-red-500/40';
+                icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            playSound('click');
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        function showHint(stage) {
+            playSound('click');
+            const modal = document.getElementById('hint-modal');
+            const titleEl = document.getElementById('hint-title');
+            const bodyEl = document.getElementById('hint-body');
+
+            const hints = {
+                1: "💡 <strong>Stage 1 힌트:</strong><br>도로교통법상 면허 정지 수치는 0.03%입니다(소수점 아래 숫자 '03').<br>면허 취소 기준 수치는 0.08%입니다(소수점 아래 숫자 '08').<br>이 두 숫자를 순서대로 이어 붙이면 암호는 <strong>0308</strong> 입니다.",
+                2: "💡 <strong>Stage 2 힌트:</strong><br>• 최초 0.08% 이상 ➔ 정직 ~ 강등<br>• 음주측정 거부 ➔ 정직 ~ 파면<br>• 2회 이상 적발 ➔ 강등 ~ 파면",
+                3: "💡 <strong>Stage 3 힌트:</strong><br>C 항목을 유심히 읽어보세요! 경기도교육청 지침상 음주운전으로 적발되면 최초 단속이라도 관내 전보 감점 및 승진 평정 불이익이 즉시 부여됩니다.",
+                4: "💡 <strong>Stage 4 힌트:</strong><br>음주운전을 막는 가장 확실하고 정당한 방법은 술을 마신 사람의 차량 열쇠를 제지하고 대리운전이나 대중교통을 이용하도록 안내하는 것입니다."
+            };
+
+            titleEl.textContent = `STAGE ${stage} 미션 힌트`;
+            bodyEl.innerHTML = hints[stage] || "힌트가 제공되지 않는 단계입니다.";
+            modal.classList.remove('hidden');
+        }
+
+        function closeHintModal() {
+            playSound('click');
+            document.getElementById('hint-modal').classList.add('hidden');
+        }
+
+        function startGame() {
+            playSound('click');
+            document.getElementById('screen-intro').classList.add('hidden');
+            goToStage(1);
+        }
+
+        function goToStage(stageNum) {
+            currentStage = stageNum;
+            document.getElementById('stage-indicator').textContent = `STAGE ${stageNum} / 5`;
+            document.getElementById('progress-bar').style.width = `${stageNum * 20}%`;
+
+            for (let i = 1; i <= 5; i++) {
+                const stageEl = document.getElementById(`stage-${i}`);
+                if (stageEl) {
+                    if (i === stageNum) {
+                        stageEl.classList.remove('hidden');
+                    } else {
+                        stageEl.classList.add('hidden');
+                    }
+                }
+            }
+        }
+
+        function pressKey(stage, num) {
+            playSound('click');
+            if (stage === 1) {
+                if (stage1Input.length < 4) {
+                    stage1Input += num;
+                    updateStage1Display();
+                }
+            }
+        }
+
+        function clearKey(stage) {
+            playSound('click');
+            if (stage === 1) {
+                stage1Input = "";
+                updateStage1Display();
+            }
+        }
+
+        function updateStage1Display() {
+            const display = document.getElementById('stage1-display');
+            display.textContent = stage1Input.padEnd(4, '-');
+        }
+
+        function submitStage1() {
+            if (stage1Input === "0308") {
+                showModal("STAGE 1 클리어!", "정답입니다! 면허 정지 기준(0.03%)과 면허 취소 기준(0.08%)을 정확히 숙지하셨습니다.<br><br><strong>학습 포인트:</strong> 숙취 상태의 아침 운전도 0.03% 이상이면 음주운전 단속 대상이 됩니다.", true);
+                setTimeout(() => {
+                    closeModal();
+                    goToStage(2);
+                }, 2000);
+            } else {
+                showModal("오류: 암호 불일치", "입력한 번호가 틀렸습니다.<br>면허정지 기준(0.03% ➔ 03)과 면허취소 기준(0.08% ➔ 08)을 생각해보세요.", false);
+            }
+        }
+
+        function submitStage2() {
+            playSound('click');
+            const q1 = document.getElementById('stage2-q1').value;
+            const q2 = document.getElementById('stage2-q2').value;
+            const q3 = document.getElementById('stage2-q3').value;
+
+            if (q1 === "정직" && q2 === "정직" && q3 === "파면") {
+                showModal("STAGE 2 클리어!", "정답입니다! 경기도교육청 교직원 음주운전 징계 기준을 완벽히 검증하셨습니다.<br><br>• 최초 0.08% 이상: 정직~강등<br>• 음주측정 거부: 정직~파면<br>• 2회 이상 적발: 강등~파면", true);
+                setTimeout(() => {
+                    closeModal();
+                    goToStage(3);
+                }, 2200);
+            } else {
+                showModal("징계 기준 불일치", "일부 징계 양정 선택이 올바르지 않습니다.<br>음주측정 거부 및 2회 이상 단속은 중징계(정직, 해임, 파면) 대상임을 확인해 주세요.", false);
+            }
+        }
+
+        function submitStage3() {
+            playSound('click');
+            const selected = document.querySelector('input[name="stage3-choice"]:checked');
+            if (!selected) {
+                showModal("선택 오류", "답안 항목 중 하나를 선택해 주세요.", false);
+                return;
+            }
+
+            if (selected.value === "3") {
+                showModal("STAGE 3 클리어!", "정답입니다! (C)항목은 거짓입니다.<br><br><strong>학습 포인트:</strong> 경기도교육청 규정에 따라 음주운전 적발 시 최초 적발이라 하더라도 관내 전보 감점, 승진 가산점 제외, 포상 제외 등 엄중한 연쇄 불이익을 받게 됩니다.", true);
+                setTimeout(() => {
+                    closeModal();
+                    goToStage(4);
+                }, 2200);
+            } else {
+                showModal("금고 해제 실패", "선택한 항목은 음주운전 적발 시 실제로 적용되는 올바른 불이익 설명입니다.<br>선택지 중 <strong class='text-red-400'>잘못된 설명</strong>을 찾아보세요.", false);
+            }
+        }
+
+        function submitStage4() {
+            playSound('click');
+            const selected = document.querySelector('input[name="stage4-choice"]:checked');
+            if (!selected) {
+                showModal("선택 오류", "시나리오 대처 방안을 선택해 주세요.", false);
+                return;
+            }
+
+            if (selected.value === "2") {
+                showModal("STAGE 4 클리어!", "정답입니다! 음주운전 차키 제지 및 대리운전 유도는 동료를 보호하는 가장 확실한 길입니다.<br><br><strong>법적 책임:</strong> 음주운전 차량 동승이나 권유는 형법상 '음주운전 방조죄'로 처벌받을 수 있습니다.", true);
+                setTimeout(() => {
+                    closeModal();
+                    goToStage(5);
+                }, 2200);
+            } else {
+                showModal("위험한 선택!", "선택하신 행동은 '음주운전 방조죄'로 형사처벌 및 교직원 징계 대상이 될 수 있습니다.<br>적극적으로 운전을 제지하는 선택을 골라주세요.", false);
+            }
+        }
+
+        function submitStage5() {
+            playSound('click');
+            const schoolInput = document.getElementById('user-school').value.trim();
+            const nameInput = document.getElementById('user-name').value.trim();
+
+            if (!schoolInput || !nameInput) {
+                showModal("입력 누락", "서약서 완성을 위해 소속 학교명과 교직원 성명을 모두 입력해 주세요.", false);
+                return;
+            }
+
+            // Fill Certificate Data
+            document.getElementById('cert-school').textContent = schoolInput;
+            document.getElementById('cert-name').textContent = nameInput;
+
+            const today = new Date();
+            const dateStr = `${today.getFullYear()}. ${String(today.getMonth() + 1).padStart(2, '0')}. ${String(today.getDate()).padStart(2, '0')}`;
+            document.getElementById('cert-date').textContent = dateStr;
+
+            const randomCode = `GOE-${today.getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            document.getElementById('cert-code').textContent = randomCode;
+
+            // Save completion record to Database & Webhook
+            saveCompletionRecord(schoolInput, nameInput, randomCode);
+
+            // Hide stage 5, show certificate
+            document.getElementById('stage-5').classList.add('hidden');
+            document.getElementById('screen-clear').classList.remove('hidden');
+
+            playSound('success');
+
+            // Trigger Confetti Effect
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        function resetGame() {
+            playSound('click');
+            currentStage = 0;
+            stage1Input = "";
+            updateStage1Display();
+            
+            document.getElementById('user-school').value = "";
+            document.getElementById('user-name').value = "";
+
+            document.getElementById('screen-clear').classList.add('hidden');
+            document.getElementById('screen-intro').classList.remove('hidden');
+            document.getElementById('progress-bar').style.width = '20%';
+            document.getElementById('stage-indicator').textContent = 'STAGE 1 / 5';
+        }
+    </script>
 </body>
 </html>
